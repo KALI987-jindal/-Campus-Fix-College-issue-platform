@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Executive Administration — CampusFix</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <style>
+    .league-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.75rem;
+    }
+    .league-table th, .league-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      font-size: 0.88rem;
+    }
+    .league-table th {
+      background: #f8fafc;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="navbar">
+    <div class="container nav-wrapper">
+      <a href="admin-dashboard.html" class="brand-logo">
+        <span>🏫 CampusFix</span>
+        <span class="brand-badge" style="background: #eff6ff; color: #1d4ed8;">Dean & Executive Admin</span>
+      </a>
+
+      <div class="nav-user">
+        <div class="user-badge">
+          <span id="navUserName">Dean H.S. Bawa</span>
+          <span class="user-role-tag" id="navUserRole" style="background: #1e3a8a;">ADMIN</span>
+        </div>
+        <button id="logoutBtn" class="btn btn-outline btn-sm">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: 1.5rem; padding-bottom: 3rem;">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+      <div>
+        <h1 class="dashboard-title">University Executive Command Center</h1>
+        <p class="dashboard-subtitle">
+          Institutional health index, department resolution benchmarking, SLA compliance, and statutory audit exports.
+        </p>
+      </div>
+      <div>
+        <button class="btn btn-primary" onclick="openAuditModal()">
+          📄 Export NAAC / UGC Audit Report
+        </button>
+      </div>
+    </div>
+
+    <!-- Executive KPI Grid -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <span class="kpi-label">Total Campus Issues</span>
+        <span class="kpi-value" id="kpiTotal">0</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Resolved Complaints</span>
+        <span class="kpi-value" id="kpiResolved" style="color: #16a34a;">0</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Active Bottlenecks</span>
+        <span class="kpi-value" id="kpiOpen" style="color: #dc2626;">0</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Resolution Rate</span>
+        <span class="kpi-value" id="kpiRate" style="color: #2563eb;">0%</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">SLA Breaches</span>
+        <span class="kpi-value" id="kpiSla" style="color: #b91c1c;">0</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Active Critical Interruptions</span>
+        <span class="kpi-value" id="kpiCritical" style="color: #ea580c;">0</span>
+      </div>
+    </div>
+
+    <!-- Two Columns: League Table & Campus Broadcasts -->
+    <div style="display: grid; grid-template-columns: 2fr 1.2fr; gap: 1.5rem; margin-top: 1.5rem;">
+      <!-- Column 1: Department Benchmarking League Table -->
+      <div class="card">
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.25rem;">
+          🏆 Department Performance League Table
+        </h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+          Cross-faculty accountability comparing resolution speed and completion percentage.
+        </p>
+
+        <div style="overflow-x: auto;">
+          <table class="league-table">
+            <thead>
+              <tr>
+                <th>Academic Faculty</th>
+                <th>Total</th>
+                <th>Resolved</th>
+                <th>Pending</th>
+                <th>Completion Rate</th>
+              </tr>
+            </thead>
+            <tbody id="deptLeagueTbody">
+              <!-- Populated via admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Column 2: Campus Outage & Broadcast Manager -->
+      <div class="card">
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.25rem;">
+          📢 Outage & Maintenance Broadcasts
+        </h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+          Announce planned power cuts, water maintenance, or server upgrades campus-wide.
+        </p>
+
+        <form id="createBroadcastForm" style="margin-bottom: 1.5rem;">
+          <div class="form-group">
+            <label class="form-label">Notice Headline</label>
+            <input type="text" id="bcTitle" class="form-control" placeholder="e.g. Server Maintenance tonight" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Announcement Details</label>
+            <textarea id="bcMessage" class="form-control" rows="2" placeholder="Time and impacted campus block..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-sm btn-primary" style="width: 100%;">Publish Campus Broadcast</button>
+        </form>
+
+        <h4 style="font-size: 0.9rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-main);">Active Campus Notices:</h4>
+        <div id="broadcastListContainer">
+          <!-- Populated via admin.js -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Statutory Audit Modal -->
+  <div id="auditModal" class="modal-overlay">
+    <div class="modal-box" style="border-top: 6px solid #1e3a8a;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="color: #1e3a8a;">📄 Statutory Grievance Redressal Audit Report</h3>
+        <button class="close-btn" onclick="closeAuditModal()">&times;</button>
+      </div>
+
+      <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.25rem; font-size: 0.9rem;">
+        <div style="margin-bottom: 0.6rem;">🏛️ <strong>Institution:</strong> <span id="auditInstitution"></span></div>
+        <div style="margin-bottom: 0.6rem;">📅 <strong>Generated On:</strong> <span id="auditGenerated"></span></div>
+        <hr style="border: none; border-top: 1px solid var(--border); margin: 0.75rem 0;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+          <div>📥 <strong>Total Grievances:</strong> <span id="auditReceived"></span></div>
+          <div>✅ <strong>Total Resolved:</strong> <span id="auditResolved"></span></div>
+          <div>📊 <strong>Redressal Rate:</strong> <span id="auditRate" style="color: #16a34a; font-weight: 700;"></span></div>
+          <div>🚨 <strong>Lecture Interventions:</strong> <span id="auditInterventions"></span></div>
+        </div>
+        <div style="background: #dcfce7; color: #166534; padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.82rem;">
+          🛡️ Compliance Status: <span id="auditCompliance"></span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.25rem;">
+        <button class="btn btn-outline" onclick="closeAuditModal()">Close Preview</button>
+        <button class="btn btn-primary" onclick="window.print()">🖨️ Print / Save as PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

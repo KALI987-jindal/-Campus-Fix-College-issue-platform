@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Portal — CampusFix</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="navbar">
+    <div class="container nav-wrapper">
+      <a href="student-dashboard.html" class="brand-logo">
+        <span>🏫 CampusFix</span>
+        <span class="brand-badge" id="navUserDept">My Department</span>
+      </a>
+
+      <div class="nav-user">
+        <div class="user-badge">
+          <span id="navUserName">Student Name</span>
+          <span class="user-role-tag" id="navUserRole">STUDENT</span>
+        </div>
+        <button id="logoutBtn" class="btn btn-outline btn-sm">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: 1.5rem; padding-bottom: 3rem;">
+    <!-- Broadcast Notice Banner -->
+    <div id="broadcastBanner" class="broadcast-banner" style="display: none;">
+      <span class="broadcast-icon">📢</span>
+      <div class="broadcast-content">
+        <h4 id="broadcastTitle">Campus Notice</h4>
+        <p id="broadcastMsg">Maintenance announcement description.</p>
+      </div>
+    </div>
+
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+      <div>
+        <h1 class="dashboard-title">Student Grievance & Issue Feed</h1>
+        <p class="dashboard-subtitle">
+          View issues in your faculty, upvote shared campus problems, or file a new maintenance request.
+        </p>
+      </div>
+      <div>
+        <button class="btn btn-primary" onclick="openReportModal()">+ Report an Issue</button>
+      </div>
+    </div>
+
+    <!-- Two-Tier Feed Tabs -->
+    <div class="tabs-nav">
+      <button id="tabMyDept" class="tab-btn active">
+        <span>🏢 My Academic Department</span>
+      </button>
+      <button id="tabCampusWide" class="tab-btn">
+        <span>🌐 Central Campus (Library, Canteen, Buses)</span>
+      </button>
+    </div>
+
+    <!-- Issues Feed List -->
+    <div id="issuesFeedContainer" class="issues-feed">
+      <!-- Populated via student.js -->
+    </div>
+  </main>
+
+  <!-- Report Issue Modal -->
+  <div id="reportModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">Submit a Maintenance Request</h3>
+        <button class="close-btn" onclick="closeReportModal()">&times;</button>
+      </div>
+
+      <form id="reportIssueForm">
+        <div class="form-group">
+          <label class="form-label">Issue Title</label>
+          <input type="text" id="issueTitle" class="form-control" placeholder="Brief summary of the fault" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Scope & Visibility</label>
+          <select id="issueScope" class="form-control" required>
+            <option value="DEPARTMENT_ONLY">Department Specific (Only my faculty peers & teachers)</option>
+            <option value="CAMPUS_WIDE">Central Campus (Shared Canteen, Library, Buses, Hostels)</option>
+          </select>
+          <div class="form-hint">Note: Faculty room tickets are private to teachers and cannot be filed by students.</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Department / Faculty</label>
+          <select id="issueDepartment" class="form-control" required>
+            <!-- Populated via API -->
+          </select>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div class="form-group">
+            <label class="form-label">Trade / Category</label>
+            <select id="issueTrade" class="form-control" required>
+              <option value="ELECTRICAL">⚡ Electrical & AC</option>
+              <option value="PLUMBING">🔧 Plumbing & Water</option>
+              <option value="CIVIL_CARPENTRY">🪚 Carpentry & Furniture</option>
+              <option value="IT">💻 IT, Wi-Fi & AV</option>
+              <option value="CLINICAL_EQUIPMENT">🏥 Lab / Clinical Equipment</option>
+              <option value="SANITATION">🧹 Cleaning & Hygiene</option>
+              <option value="GENERAL">📦 General Infrastructure</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Urgency Priority</label>
+            <select id="issuePriority" class="form-control" required>
+              <option value="LOW">Low (Cosmetic)</option>
+              <option value="MEDIUM" selected>Medium (Standard)</option>
+              <option value="HIGH">High (Disruptive)</option>
+              <option value="CRITICAL">Critical (Hazard)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Exact Location (Block, Floor, Room No.)</label>
+          <input type="text" id="issueLocation" class="form-control" placeholder="e.g. Science Block, Room 204 or Canteen 1st floor" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Detailed Description</label>
+          <textarea id="issueDesc" class="form-control" rows="3" placeholder="Provide full details of the malfunction..." required></textarea>
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+          <input type="checkbox" id="issueAnonymous">
+          <label for="issueAnonymous" style="font-size: 0.85rem; cursor: pointer;">
+            Report Anonymously (Hide my name on public feeds)
+          </label>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-outline" onclick="closeReportModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Submit Ticket</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Resolution Verification Modal -->
+  <div id="verifyModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">Verify & Rate Completed Fix</h3>
+        <button class="close-btn" onclick="closeVerifyModal()">&times;</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Rate Quality of Repair (1 to 5 Stars)</label>
+        <select id="verifyRating" class="form-control">
+          <option value="5">⭐⭐⭐⭐⭐ Excellent (5 Stars)</option>
+          <option value="4">⭐⭐⭐⭐ Good (4 Stars)</option>
+          <option value="3">⭐⭐⭐ Satisfactory (3 Stars)</option>
+          <option value="2">⭐⭐ Poor (2 Stars)</option>
+          <option value="1">⭐ Unacceptable (1 Star)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Feedback Comments (Optional)</label>
+        <textarea id="verifyComment" class="form-control" rows="2" placeholder="Was the work done cleanly?"></textarea>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.25rem;">
+        <button class="btn btn-outline" onclick="closeVerifyModal()">Close</button>
+        <button class="btn btn-success" onclick="submitVerification()">Confirm & Close Ticket</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/student.js"></script>
+</body>
+</html>

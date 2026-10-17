@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Faculty Portal — CampusFix</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="navbar">
+    <div class="container nav-wrapper">
+      <a href="teacher-dashboard.html" class="brand-logo">
+        <span>🏫 CampusFix</span>
+        <span class="brand-badge" id="navUserDept">Faculty Portal</span>
+      </a>
+
+      <div class="nav-user">
+        <div class="user-badge">
+          <span id="navUserName">Teacher Name</span>
+          <span class="user-role-tag" id="navUserRole" style="background: #9333ea;">TEACHER</span>
+        </div>
+        <button id="logoutBtn" class="btn btn-outline btn-sm">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: 1.5rem; padding-bottom: 3rem;">
+    <!-- Dashboard Header & Action Buttons -->
+    <div class="dashboard-header">
+      <div>
+        <h1 class="dashboard-title">Faculty Command Center</h1>
+        <p class="dashboard-subtitle">
+          Manage classroom & lab infrastructure, monitor student tickets, and file private faculty room requests.
+        </p>
+      </div>
+      <div style="display: flex; gap: 0.75rem;">
+        <button class="btn btn-danger" onclick="openLectureCriticalModal()">
+          🚨 Class Disrupted (15m SLA)
+        </button>
+        <button class="btn btn-primary" onclick="openFacultyRoomModal()">
+          ☕ Faculty Room Maintenance
+        </button>
+      </div>
+    </div>
+
+    <!-- Teacher Scoped Tabs -->
+    <div class="tabs-nav">
+      <button id="tabDept" class="tab-btn active">
+        <span>🏢 Department Labs & Classrooms</span>
+      </button>
+      <button id="tabFacultyRoom" class="tab-btn">
+        <span>☕ Faculty Room (Private to Staff)</span>
+      </button>
+      <button id="tabCampus" class="tab-btn">
+        <span>🌐 Central Campus Facilities</span>
+      </button>
+    </div>
+
+    <!-- Feed Container -->
+    <div id="teacherFeedContainer" class="issues-feed">
+      <!-- Populated via teacher.js -->
+    </div>
+  </main>
+
+  <!-- Lecture-Critical Emergency Modal -->
+  <div id="lectureCriticalModal" class="modal-overlay">
+    <div class="modal-box" style="border-top: 6px solid #dc2626;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="color: #b91c1c;">🚨 Lecture-Critical Urgent Intervention</h3>
+        <button class="close-btn" onclick="closeLectureCriticalModal()">&times;</button>
+      </div>
+
+      <p style="font-size: 0.85rem; color: #475569; margin-bottom: 1rem;">
+        Use this emergency form if an active class is halted due to hardware/power breakdown. Dispatches an instant priority alert with a <strong>15-minute response SLA</strong>.
+      </p>
+
+      <form id="lectureCriticalForm">
+        <div class="form-group">
+          <label class="form-label">Malfunction Summary</label>
+          <input type="text" id="lcTitle" class="form-control" placeholder="e.g. Smart projector bulb blown during class" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Lecture Hall / Room Number</label>
+          <input type="text" id="lcLocation" class="form-control" placeholder="e.g. Aryabhata Block, Lecture Hall 201" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div class="form-group">
+            <label class="form-label">Department</label>
+            <select id="lcDept" class="form-control" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">System Affected</label>
+            <select id="lcTrade" class="form-control" required>
+              <option value="IT">💻 Projector / Audio / PC</option>
+              <option value="ELECTRICAL">⚡ Power Cut / AC Failure</option>
+              <option value="CIVIL_CARPENTRY">🪚 Podium / Seating</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Immediate Impact Details</label>
+          <textarea id="lcDesc" class="form-control" rows="2" placeholder="e.g. 60 students in hall; visual slides interrupted" required></textarea>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-outline" onclick="closeLectureCriticalModal()">Cancel</button>
+          <button type="submit" class="btn btn-danger">Trigger 15m Urgent Dispatch</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Faculty Room Maintenance Modal (100% Student-Private) -->
+  <div id="facultyRoomModal" class="modal-overlay">
+    <div class="modal-box" style="border-top: 6px solid #9333ea;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="color: #6b21a8;">☕ Faculty Room & Cabin Maintenance</h3>
+        <button class="close-btn" onclick="closeFacultyRoomModal()">&times;</button>
+      </div>
+
+      <div class="badge badge-assigned" style="width: 100%; margin-bottom: 1rem; padding: 0.5rem; justify-content: flex-start;">
+        🔒 Student Privacy Guaranteed: This complaint will NEVER appear on student feeds.
+      </div>
+
+      <form id="facultyRoomForm">
+        <div class="form-group">
+          <label class="form-label">Issue Title</label>
+          <input type="text" id="frTitle" class="form-control" placeholder="e.g. Heavy-duty printer toner empty / Cabin AC water dripping" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Department / Faculty Wing</label>
+          <select id="frDept" class="form-control" required></select>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div class="form-group">
+            <label class="form-label">Faculty Amenity Category</label>
+            <select id="frTrade" class="form-control" required>
+              <option value="IT">🖨️ Staff Printer / Scanner / LAN</option>
+              <option value="ELECTRICAL">⚡ Cabin AC / Fan / Socket</option>
+              <option value="CIVIL_CARPENTRY">🪑 Revolving Chair / Desk Lock</option>
+              <option value="SANITATION">🧼 Staff Washroom Hygiene</option>
+              <option value="GENERAL">☕ Water Dispenser / Kettle</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Teacher Free Slot (Available Time)</label>
+            <input type="text" id="frSlot" class="form-control" placeholder="e.g. 1:30 PM - 3:00 PM (Lunch)" required>
+            <div class="form-hint">Technician will visit only during this window.</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Staff Cabin / Lounge Location</label>
+          <input type="text" id="frLocation" class="form-control" placeholder="e.g. Law Faculty Room 202, Desk #4" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Details</label>
+          <textarea id="frDesc" class="form-control" rows="2" placeholder="Describe the amenity problem..." required></textarea>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-outline" onclick="closeFacultyRoomModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" style="background: #9333ea;">File Private Staff Ticket</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/teacher.js"></script>
+</body>
+</html>

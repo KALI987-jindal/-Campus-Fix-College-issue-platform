@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maintenance & Ground Staff Workboard — CampusFix</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="navbar">
+    <div class="container nav-wrapper">
+      <a href="technician-workboard.html" class="brand-logo">
+        <span>🏫 CampusFix</span>
+        <span class="brand-badge" style="background: #fef3c7; color: #b45309;">Ground Operations</span>
+      </a>
+
+      <div class="nav-user">
+        <div class="user-badge">
+          <span id="navUserName">Staff Name</span>
+          <span class="user-role-tag" id="navUserRole" style="background: #0284c7;">STAFF</span>
+        </div>
+        <button id="logoutBtn" class="btn btn-outline btn-sm">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" style="padding-top: 1.5rem; padding-bottom: 3rem;">
+    <!-- Active Role Notice -->
+    <div id="techRoleNotice" class="badge badge-assigned" style="display: none; padding: 0.6rem 1rem; width: 100%; margin-bottom: 1rem; font-size: 0.88rem;"></div>
+
+    <!-- Header -->
+    <div class="dashboard-header">
+      <div>
+        <h1 class="dashboard-title">Supervisor & Field Worker Queue</h1>
+        <p class="dashboard-subtitle">
+          Hybrid Operations: Supervisors dispatch daily wage staff, while smartphone-enabled technicians execute 1-click photo proof updates.
+        </p>
+      </div>
+      <div>
+        <button class="btn btn-outline" onclick="loadStaffTasks()">🔄 Refresh Tasks</button>
+      </div>
+    </div>
+
+    <!-- Tasks List Container -->
+    <div id="tasksContainer" style="max-width: 800px; margin: 1rem auto 0 auto;">
+      <!-- Populated via staff.js -->
+    </div>
+  </main>
+
+  <!-- Proof Photo Upload Modal -->
+  <div id="proofModal" class="modal-overlay">
+    <div class="modal-box" style="border-top: 6px solid #16a34a;">
+      <div class="modal-header">
+        <h3 class="modal-title" style="color: #15803d;">📸 Upload Fix Photo Proof</h3>
+        <button class="close-btn" onclick="closeProofModal()">&times;</button>
+      </div>
+
+      <p style="font-size: 0.85rem; color: #475569; margin-bottom: 1rem;">
+        To ensure transparency and prevent premature closing, submit proof showing the repaired equipment/fixture.
+      </p>
+
+      <div class="form-group">
+        <label class="form-label">Photo Proof URL / Snapshot</label>
+        <input type="text" id="proofPhotoUrl" class="form-control" placeholder="e.g. /uploads/fixed_pipe_photo.jpg" value="/uploads/repaired_equipment_proof.jpg" required>
+        <div class="form-hint">Tip: Camera photo or static image path.</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Resolution Summary Note</label>
+        <input type="text" id="proofNote" class="form-control" placeholder="e.g. Replaced burnt fuse / tightened pipe coupling" required>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+        <button class="btn btn-outline" onclick="closeProofModal()">Cancel</button>
+        <button class="btn btn-success" onclick="submitProof()">Verify & Mark Resolved</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/staff.js"></script>
+</body>
+</html>

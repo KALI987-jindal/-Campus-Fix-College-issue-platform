@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusFix — Multi-Department College Issue Platform</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <style>
+    .hero-section {
+      text-align: center;
+      padding: 3.5rem 1rem 2rem 1rem;
+    }
+    .hero-title {
+      font-size: 2.75rem;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+    }
+    .hero-title span {
+      color: var(--primary);
+    }
+    .hero-desc {
+      font-size: 1.15rem;
+      color: var(--secondary);
+      max-width: 720px;
+      margin: 0 auto 2rem auto;
+    }
+    .faculties-strip {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 2.5rem;
+    }
+    .faculty-pill {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      padding: 0.35rem 0.85rem;
+      border-radius: var(--radius-full);
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--secondary);
+      box-shadow: var(--shadow-sm);
+    }
+    .auth-card-container {
+      max-width: 460px;
+      margin: 0 auto 3rem auto;
+    }
+    .demo-showcase-box {
+      background: #ffffff;
+      border: 2px dashed #93c5fd;
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin: 2rem auto;
+      max-width: 860px;
+    }
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    .demo-btn {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--bg-main);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .demo-btn:hover {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+    .demo-role {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-main);
+    }
+    .demo-email {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      margin-top: 0.15rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header class="navbar">
+    <div class="container nav-wrapper">
+      <a href="index.html" class="brand-logo">
+        <span>🏫 CampusFix</span>
+        <span class="brand-badge">Multi-Faculty HLD</span>
+      </a>
+      <div>
+        <button class="btn btn-outline btn-sm" onclick="openRegisterModal()">Create Account</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main class="container">
+    <section class="hero-section">
+      <h1 class="hero-title">Unified College Issue & <span>Grievance Platform</span></h1>
+      <p class="hero-desc">
+        Zero-clutter department isolation for Engineering, Law, Dental, Physiotherapy & Sciences, with 15-minute lecture-critical alerts, private faculty rooms, and hybrid ground worker dispatch.
+      </p>
+
+      <!-- Faculty Tags -->
+      <div class="faculties-strip">
+        <span class="faculty-pill">⚙️ Engineering</span>
+        <span class="faculty-pill">⚖️ Law</span>
+        <span class="faculty-pill">🦷 Dental</span>
+        <span class="faculty-pill">🏃 Physiotherapy</span>
+        <span class="faculty-pill">🔬 Sciences (BSc/MSc)</span>
+        <span class="faculty-pill">🎓 Masters (PG)</span>
+        <span class="faculty-pill">🧪 Ph.D. Research</span>
+        <span class="faculty-pill">🌐 Central Campus</span>
+      </div>
+    </section>
+
+    <!-- Standard Login Box -->
+    <div class="auth-card-container">
+      <div class="card">
+        <h3 style="margin-bottom: 0.5rem; font-size: 1.25rem;">Sign In to Portal</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">
+          Enter your institutional credentials to access your scoped feed.
+        </p>
+
+        <div id="loginError" class="badge badge-sla-breached" style="display: none; width: 100%; margin-bottom: 1rem; padding: 0.5rem;"></div>
+
+        <form id="loginForm">
+          <div class="form-group">
+            <label class="form-label" for="loginEmail">Institutional Email</label>
+            <input type="email" id="loginEmail" class="form-control" placeholder="name@college.edu" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">Login to Dashboard</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- 1-Click Viva Demo Box -->
+    <div class="demo-showcase-box">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h4 style="font-size: 1.1rem; color: #1e3a8a;">⚡ 1-Click Viva Demo Login Accounts</h4>
+          <p style="font-size: 0.82rem; color: var(--text-muted);">
+            Click any role below to instantly log in and experience that role's isolated feed and features. (Password: <code>college123</code>)
+          </p>
+        </div>
+        <span class="badge badge-assigned">Examiner Ready</span>
+      </div>
+
+      <div class="demo-grid">
+        <!-- Student Engg -->
+        <div class="demo-btn" onclick="quickDemoLogin('student.engg@college.edu')">
+          <span class="demo-role">👨‍🎓 Engineering Student</span>
+          <span class="demo-email">student.engg@college.edu (Sees Workshop & Engg Labs)</span>
+        </div>
+
+        <!-- Student Law -->
+        <div class="demo-btn" onclick="quickDemoLogin('student.law@college.edu')">
+          <span class="demo-role">⚖️ Law Student</span>
+          <span class="demo-email">student.law@college.edu (Sees Moot Court & Legal Labs)</span>
+        </div>
+
+        <!-- Student Physio -->
+        <div class="demo-btn" onclick="quickDemoLogin('student.physio@college.edu')">
+          <span class="demo-role">🏃 Physiotherapy Student</span>
+          <span class="demo-email">student.physio@college.edu (Sees Rehab & Electrotherapy)</span>
+        </div>
+
+        <!-- Teacher Engg -->
+        <div class="demo-btn" onclick="quickDemoLogin('teacher.engg@college.edu')">
+          <span class="demo-role">👩‍🏫 Teacher (Engineering)</span>
+          <span class="demo-email">teacher.engg@college.edu (Has 15-min Lecture Alert)</span>
+        </div>
+
+        <!-- Teacher Law (Faculty Room) -->
+        <div class="demo-btn" onclick="quickDemoLogin('teacher.law@college.edu')">
+          <span class="demo-role">☕ Teacher (Law — Staff Room)</span>
+          <span class="demo-email">teacher.law@college.edu (Sees Private Faculty Room Printer)</span>
+        </div>
+
+        <!-- Estate Supervisor -->
+        <div class="demo-btn" onclick="quickDemoLogin('supervisor.civil@college.edu')">
+          <span class="demo-role">👷 Estate Supervisor (JE)</span>
+          <span class="demo-email">supervisor.civil@college.edu (Dispatches Carpenters/Plumbers)</span>
+        </div>
+
+        <!-- Technician Plumber -->
+        <div class="demo-btn" onclick="quickDemoLogin('plumber.suresh@college.edu')">
+          <span class="demo-role">🔧 Plumber Suresh (Ground Staff)</span>
+          <span class="demo-email">plumber.suresh@college.edu (1-Click Mobile Task UI)</span>
+        </div>
+
+        <!-- Central Dean / Admin -->
+        <div class="demo-btn" onclick="quickDemoLogin('dean.admin@college.edu')">
+          <span class="demo-role">🏛️ Dean / Super Admin</span>
+          <span class="demo-email">dean.admin@college.edu (Cross-Dept Analytics & Broadcasts)</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Registration Modal -->
+  <div id="registerModal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">Register New Account</h3>
+        <button class="close-btn" onclick="closeRegisterModal()">&times;</button>
+      </div>
+
+      <div id="regError" class="badge badge-sla-breached" style="display: none; width: 100%; margin-bottom: 1rem; padding: 0.5rem;"></div>
+
+      <form id="registerForm">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" id="regFullName" class="form-control" placeholder="e.g. Rahul Sharma" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">College Email</label>
+          <input type="email" id="regEmail" class="form-control" placeholder="username@college.edu" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="regPassword" class="form-control" placeholder="••••••••" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">User Role</label>
+          <select id="regRole" class="form-control" required>
+            <option value="STUDENT">Student</option>
+            <option value="TEACHER">Teacher / Faculty</option>
+            <option value="HOD">Department HOD</option>
+            <option value="SUPERVISOR">Estate Supervisor (JE)</option>
+            <option value="TECHNICIAN">Ground Technician (Plumber/Carpenter/etc.)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Academic Department</label>
+          <select id="regDepartment" class="form-control">
+            <!-- Populated via API -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Designation / Year</label>
+          <input type="text" id="regDesignation" class="form-control" placeholder="e.g. B.Tech 3rd Year or Assistant Professor">
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
+          <button type="button" class="btn btn-outline" onclick="closeRegisterModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    function openRegisterModal() {
+      document.getElementById('registerModal').classList.add('open');
+    }
+    function closeRegisterModal() {
+      document.getElementById('registerModal').classList.remove('open');
+    }
+  </script>
+</body>
+</html>
