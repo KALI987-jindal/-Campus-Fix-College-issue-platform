@@ -4,98 +4,471 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Faculty Portal — CampusFix</title>
+  <!-- Google Fonts: Plus Jakarta Sans & Material Symbols Outlined -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/dashboard.css">
 </head>
-<body>
+<body style="background: var(--bg-main); min-height: 100vh; display: flex; flex-direction: column;">
 
-  <!-- Top Navigation -->
-  <header class="navbar">
-    <div class="container nav-wrapper">
-      <a href="teacher-dashboard.html" class="brand-logo">
-        <span>🏫 CampusFix</span>
-        <span class="brand-badge" id="navUserDept">Faculty Portal</span>
+  <!-- Sticky Top Navigation -->
+  <header class="stitch-navbar">
+    <div class="stitch-nav-inner">
+      <!-- Brand Logo -->
+      <a href="teacher-dashboard.html" class="stitch-nav-brand">
+        <div class="stitch-brand-icon">
+          <span class="material-symbols-outlined" style="font-size: 22px;">school</span>
+        </div>
+        <div class="stitch-brand-text">
+          <span class="stitch-brand-title">CampusFix</span>
+          <span class="stitch-brand-subtitle">Faculty Portal</span>
+        </div>
       </a>
 
-      <div class="nav-user">
-        <div class="user-badge">
-          <span id="navUserName">Teacher Name</span>
-          <span class="user-role-tag" id="navUserRole" style="background: #9333ea;">TEACHER</span>
+      <!-- Navigation Tabs (Stitch Style) -->
+      <nav class="stitch-nav-links" id="teacherNavTabs">
+        <button class="stitch-nav-link active" id="tabFacultyDashboard" type="button">
+          <span class="material-symbols-outlined" style="font-size: 18px;">dashboard</span>
+          <span>Dashboard</span>
+        </button>
+        <button class="stitch-nav-link" id="tabDept" type="button">
+          <span class="material-symbols-outlined" style="font-size: 18px;">meeting_room</span>
+          <span>Classrooms & Labs</span>
+        </button>
+        <button class="stitch-nav-link" id="tabFacultyRoom" type="button">
+          <span class="material-symbols-outlined" style="font-size: 18px;">lock</span>
+          <span>Faculty Quarters</span>
+        </button>
+        <button class="stitch-nav-link" id="tabCampus" type="button">
+          <span class="material-symbols-outlined" style="font-size: 18px;">public</span>
+          <span>Central Campus</span>
+        </button>
+        <button class="stitch-nav-link" id="tabSignOffNav" type="button">
+          <span class="material-symbols-outlined" style="font-size: 18px;">verified_user</span>
+          <span>Sign-Offs</span>
+        </button>
+      </nav>
+
+      <!-- Right Utility Actions -->
+      <div class="stitch-nav-actions">
+        <!-- Help Desk Quick Link -->
+        <a href="tel:4410" class="stitch-nav-link" id="helpDeskLink" title="AV Help Desk Ext. 4410">
+          <span class="material-symbols-outlined" style="font-size: 18px;">help_center</span>
+          <span>AV Desk (4410)</span>
+        </a>
+
+        <!-- Notifications Bell -->
+        <div style="position: relative; display: flex; align-items: center;">
+          <button class="stitch-nav-link" type="button" aria-label="Notifications" style="padding: 0.45rem; border-radius: var(--radius-md);">
+            <span class="material-symbols-outlined" style="font-size: 20px;">notifications</span>
+          </button>
+          <span id="notifBadge" style="position: absolute; top: 0; right: 0; background: var(--danger); color: #fff; font-size: 10px; font-weight: 700; border-radius: 9999px; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;">•</span>
         </div>
-        <button id="logoutBtn" class="btn btn-outline btn-sm">Logout</button>
+
+        <div style="height: 24px; width: 1px; background: var(--border);"></div>
+
+        <!-- Faculty Profile Pill -->
+        <div class="stitch-nav-user">
+          <div class="stitch-user-info">
+            <span class="stitch-user-name" id="navUserName">Teacher Name</span>
+            <span class="stitch-user-dept" id="navUserDept">Faculty Portal</span>
+            <!-- Hidden role tag kept for backward compatibility -->
+            <span id="navUserRole" style="display: none;">TEACHER</span>
+          </div>
+          <div class="stitch-user-avatar" style="background: #9333ea;">
+            <span class="material-symbols-outlined" style="font-size: 18px;">person</span>
+          </div>
+        </div>
+
+        <!-- Logout Button -->
+        <button id="logoutBtn" class="btn btn-outline btn-sm" title="Log out of session">
+          <span class="material-symbols-outlined" style="font-size: 16px;">logout</span>
+          <span style="font-size: 0.8rem;">Logout</span>
+        </button>
       </div>
     </div>
   </header>
 
-  <main class="container" style="padding-top: 1.5rem; padding-bottom: 3rem;">
-    <!-- Dashboard Header & Action Buttons -->
-    <div class="dashboard-header">
-      <div>
-        <h1 class="dashboard-title">Faculty Command Center</h1>
-        <p class="dashboard-subtitle">
-          Manage classroom & lab infrastructure, monitor student tickets, and file private faculty room requests.
-        </p>
+  <!-- Main Container -->
+  <main class="container" style="max-width: 1280px; margin: 0 auto; padding: 1.5rem 1.5rem 3rem 1.5rem; flex: 1;">
+
+    <!-- Broadcast Notice Banner (Dynamic via API) -->
+    <div id="broadcastBanner" class="broadcast-banner" style="display: none;">
+      <div class="broadcast-icon">📢</div>
+      <div class="broadcast-content" style="flex: 1;">
+        <h4 id="broadcastTitle">Campus Notice</h4>
+        <p id="broadcastMsg">Maintenance announcement description.</p>
       </div>
-      <div style="display: flex; gap: 0.75rem;">
-        <button class="btn btn-danger" onclick="openLectureCriticalModal()">
-          🚨 Class Disrupted (15m SLA)
-        </button>
-        <button class="btn btn-primary" onclick="openFacultyRoomModal()">
-          ☕ Faculty Room Maintenance
-        </button>
-      </div>
+      <button onclick="document.getElementById('broadcastBanner').style.display='none'" style="background: transparent; border: none; color: #fff; opacity: 0.7; cursor: pointer; font-size: 1.25rem;">&times;</button>
     </div>
 
-    <!-- Teacher Scoped Tabs -->
-    <div class="tabs-nav">
-      <button id="tabDept" class="tab-btn active">
-        <span>🏢 Department Labs & Classrooms</span>
-      </button>
-      <button id="tabFacultyRoom" class="tab-btn">
-        <span>☕ Faculty Room (Private to Staff)</span>
-      </button>
-      <button id="tabCampus" class="tab-btn">
-        <span>🌐 Central Campus Facilities</span>
-      </button>
-    </div>
+    <!-- Welcome & Greeting Section -->
+    <section class="stitch-welcome-section">
+      <div class="stitch-welcome-row">
+        <div class="stitch-welcome-content">
+          <div class="stitch-welcome-badges">
+            <span class="term-badge" style="background: #ede9fe; color: #6d28d9;">Academic Faculty Portal</span>
+            <span style="opacity: 0.4;">•</span>
+            <span style="font-size: 0.75rem; color: var(--secondary); font-weight: 600;">Spring Term 2026</span>
+            <span style="opacity: 0.4;">•</span>
+            <span class="live-badge">
+              <span class="live-dot"></span> System Live
+            </span>
+          </div>
+          <h1 class="stitch-welcome-title">
+            Welcome back, <span id="welcomeTeacherName">Professor</span>!
+          </h1>
+          <p class="stitch-welcome-desc">
+            Manage classroom technical emergencies, departmental laboratory infrastructure, and confidential faculty quarters work orders with expedited academic priority dispatch.
+            <span class="stitch-dept-highlight" id="facultyDeptSubtitle">Engineering & Technology</span>
+          </p>
+        </div>
 
-    <!-- Feed Container -->
-    <div id="teacherFeedContainer" class="issues-feed">
+        <!-- Action Button Group -->
+        <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+          <button class="btn btn-danger" onclick="openLectureCriticalModal()" type="button" style="padding: 0.75rem 1.25rem; font-weight: 700; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);">
+            <span class="material-symbols-outlined" style="font-size: 20px;">fmd_bad</span>
+            <span>🚨 Class Disrupted (15m SLA)</span>
+          </button>
+          <button class="stitch-btn-primary" onclick="openFacultyRoomModal()" type="button" style="background: #9333ea; box-shadow: 0 4px 12px rgba(147, 51, 234, 0.25);">
+            <span class="material-symbols-outlined" style="font-size: 20px;">meeting_room</span>
+            <span>☕ Private Faculty Ticket</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Metric Summary Cards Grid (Calculated Strictly From Real API Data) -->
+    <section class="stitch-kpi-grid">
+      <!-- Card 1: My Open Requests -->
+      <div class="stitch-kpi-card" id="kpiCardMyRequests" style="cursor: pointer;">
+        <div class="kpi-card-top">
+          <div>
+            <div class="kpi-card-label">My Open Requests</div>
+            <div class="kpi-card-number" id="kpiMyRequestsCount">0</div>
+          </div>
+          <div class="kpi-card-icon navy">
+            <span class="material-symbols-outlined" style="font-size: 24px;">assignment</span>
+          </div>
+        </div>
+        <div class="kpi-card-bottom">
+          <span id="kpiMyRequestsSubtext">0 Active Tickets</span>
+          <span class="kpi-status-tag active">Faculty Filed</span>
+        </div>
+      </div>
+
+      <!-- Card 2: Lecture Disruptions (Urgent Alert Style) -->
+      <div class="stitch-kpi-card" id="kpiCardLectureCritical" style="border-top: 4px solid var(--danger);">
+        <div class="kpi-card-top">
+          <div>
+            <div class="kpi-card-label" style="color: var(--danger); font-weight: 800; display: flex; align-items: center; gap: 4px;">
+              <span class="material-symbols-outlined" style="font-size: 16px;">warning</span>
+              <span>Lecture Disruptions</span>
+            </div>
+            <div class="kpi-card-number" id="kpiLectureCriticalCount" style="color: var(--danger);">0</div>
+          </div>
+          <div class="kpi-card-icon" style="background: #fee2e2; color: #dc2626;">
+            <span class="material-symbols-outlined" style="font-size: 24px;">fmd_bad</span>
+          </div>
+        </div>
+        <div class="kpi-card-bottom">
+          <span id="kpiLectureCriticalSubtext" style="color: var(--danger); font-weight: 600;">No Active Emergencies</span>
+          <span class="kpi-status-tag" id="kpiLectureCriticalBadge" style="background: #fee2e2; color: #991b1b;">15m Target</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Requests In Progress -->
+      <div class="stitch-kpi-card" id="kpiCardInProgress">
+        <div class="kpi-card-top">
+          <div>
+            <div class="kpi-card-label">Requests In Progress</div>
+            <div class="kpi-card-number blue" id="kpiInProgressCount">0</div>
+          </div>
+          <div class="kpi-card-icon blue">
+            <span class="material-symbols-outlined" style="font-size: 24px;">engineering</span>
+          </div>
+        </div>
+        <div class="kpi-card-bottom">
+          <span id="kpiInProgressSubtext">Assigned Technicians</span>
+          <span class="kpi-status-tag active">Field Orders</span>
+        </div>
+      </div>
+
+      <!-- Card 4: Resolved Requests -->
+      <div class="stitch-kpi-card" id="kpiCardResolved" style="cursor: pointer;">
+        <div class="kpi-card-top">
+          <div>
+            <div class="kpi-card-label">Resolved Requests</div>
+            <div class="kpi-card-number green" id="kpiResolvedCount">0</div>
+          </div>
+          <div class="kpi-card-icon green">
+            <span class="material-symbols-outlined" style="font-size: 24px;">task_alt</span>
+          </div>
+        </div>
+        <div class="kpi-card-bottom">
+          <span id="kpiResolvedSubtext">Awaiting Sign-Off</span>
+          <span class="kpi-status-tag success">Verified</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Prominent Lecture Disruption Alert Banner (Dynamic via API) -->
+    <div id="lectureDisruptionContainer" class="lecture-disruption-container">
       <!-- Populated via teacher.js -->
     </div>
+
+    <!-- Main 2-Column Academic Operations Grid (8 cols Left / 4 cols Right) -->
+    <div class="stitch-main-grid">
+
+      <!-- Left Column: Queue & Verification Sign-Off (8 cols) -->
+      <div class="stitch-feed-column">
+
+        <!-- Subsection A: Faculty Issues Queue -->
+        <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-md" style="background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem;">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm pb-space-xs" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+              <h2 class="stitch-card-title" style="font-size: 1.35rem; color: var(--primary);">Department & Classroom Requests</h2>
+              <p class="stitch-section-desc">Classroom teaching hubs, departmental laboratories, and private quarters work orders.</p>
+            </div>
+            <span class="stitch-section-badge" id="queueActiveBadge">Loading Queue...</span>
+          </div>
+
+          <!-- Filter Pills Bar -->
+          <div class="filter-pills-bar">
+            <button class="filter-pill-btn active" id="pillAllRequests" type="button">All Requests</button>
+            <button class="filter-pill-btn" id="pillClassrooms" type="button">Classrooms & Labs</button>
+            <button class="filter-pill-btn" id="pillFacultyRoom" type="button">Private Faculty Quarters</button>
+            <button class="filter-pill-btn" id="pillCampusWide" type="button">Central Campus</button>
+          </div>
+
+          <!-- Quick Search & Filter Utility Toolbar -->
+          <div class="stitch-search-toolbar" style="margin-bottom: 0.5rem;">
+            <div class="stitch-search-input-wrapper">
+              <span class="material-symbols-outlined stitch-search-icon">search</span>
+              <input type="text" id="searchTeacherInput" class="stitch-search-input" placeholder="Search by classroom, equipment, fault, or technician...">
+            </div>
+            <div class="stitch-filter-group">
+              <select id="filterTeacherPriority" class="stitch-filter-select">
+                <option value="ALL">All Priorities</option>
+                <option value="LECTURE_CRITICAL">🚨 Lecture-Critical Only</option>
+                <option value="CRITICAL">Critical</option>
+                <option value="HIGH">High</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="LOW">Low</option>
+              </select>
+              <button id="resetTeacherFiltersBtn" class="stitch-filter-btn" title="Reset Filters" type="button">
+                <span class="material-symbols-outlined" style="font-size: 18px;">tune</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Issues Queue Container -->
+          <div id="teacherFeedContainer" class="stitch-issues-list">
+            <div style="text-align: center; padding: 2.5rem; color: var(--secondary);">Loading faculty issues...</div>
+          </div>
+        </div>
+
+        <!-- Subsection B: Classroom & Lab Repair Sign-Off (Verification Section) -->
+        <div id="verificationSection" class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-md" style="background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; margin-top: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; border-bottom: 1px solid var(--border); padding-bottom: 0.85rem;">
+            <div style="display: flex; align-items: center; gap: 0.65rem;">
+              <div style="width: 38px; height: 38px; border-radius: var(--radius-md); background: #d1fae5; color: #065f46; display: flex; align-items: center; justify-content: center;">
+                <span class="material-symbols-outlined" style="font-size: 22px;">verified_user</span>
+              </div>
+              <div>
+                <h3 style="font-family: var(--font-sans); font-size: 1.2rem; font-weight: 700; color: var(--primary); margin: 0;">
+                  Classroom & Lab Repair Sign-Off
+                </h3>
+                <p style="font-size: 0.82rem; color: var(--secondary); margin: 2px 0 0 0;">
+                  Work orders completed by technicians require faculty sign-off before official closure.
+                </p>
+              </div>
+            </div>
+            <span class="stitch-badge" id="pendingSignOffBadge" style="background: #d1fae5; color: #065f46; font-size: 0.78rem;">
+              0 Pending Sign-Off
+            </span>
+          </div>
+
+          <!-- Sign-Off Items Container -->
+          <div id="signOffContainer" style="display: flex; flex-direction: column; gap: 1rem;">
+            <!-- Populated via teacher.js -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Private Quarters & Rapid Contacts (4 cols) -->
+      <aside class="stitch-sidebar-column">
+
+        <!-- Subsection C: Private Faculty Quarters Panel -->
+        <div class="stitch-panel-card" id="privateQuartersPanel" style="border-top: 4px solid #9333ea;">
+          <div class="panel-header-row">
+            <span class="stitch-badge" style="background: #f3e8ff; color: #7e22ce; font-weight: 700;">
+              <span class="material-symbols-outlined" style="font-size: 14px;">lock</span>
+              <span>Restricted Quarters</span>
+            </span>
+            <span class="material-symbols-outlined" style="color: #9333ea; font-size: 18px;" title="Confidential Staff Records">verified</span>
+          </div>
+
+          <div>
+            <h2 class="panel-title" style="font-size: 1.15rem;">Private Faculty Quarters</h2>
+            <p class="panel-info-note" style="margin-top: 0.35rem; background: #faf5ff; border: 1px solid #f3e8ff; color: #6b21a8;">
+              <span class="material-symbols-outlined" style="font-size: 16px; color: #9333ea; flex-shrink: 0; margin-top: 1px;">security</span>
+              <span>Requests logged here are strictly restricted to assigned faculty and vetted staff. Never shared on student feeds.</span>
+            </p>
+          </div>
+
+          <div style="background: var(--surface-low); border-radius: var(--radius-md); padding: 0.75rem; display: flex; align-items: center; gap: 0.65rem;">
+            <span class="material-symbols-outlined" style="font-size: 22px; color: #9333ea;">meeting_room</span>
+            <div style="display: flex; flex-direction: column;">
+              <span style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--secondary);">Department Office Suite</span>
+              <span style="font-size: 0.85rem; font-weight: 700; color: var(--primary);" id="assignedOfficeText">Department Faculty Lounge & Suites</span>
+            </div>
+          </div>
+
+          <!-- Private Office Tickets Container -->
+          <div id="facultyRoomListContainer" style="display: flex; flex-direction: column; gap: 0.65rem;">
+            <!-- Populated via teacher.js -->
+          </div>
+
+          <button class="stitch-btn-primary" onclick="openFacultyRoomModal()" type="button" style="background: #9333ea; justify-content: center; box-shadow: none;">
+            <span class="material-symbols-outlined" style="font-size: 18px;">add</span>
+            <span>+ New Private Office Request</span>
+          </button>
+        </div>
+
+        <!-- Subsection D: Maintenance Access Slots Protocol -->
+        <div class="stitch-panel-card">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <div style="width: 32px; height: 32px; border-radius: var(--radius-md); background: #eaedff; color: var(--primary); display: flex; align-items: center; justify-content: center;">
+              <span class="material-symbols-outlined" style="font-size: 18px;">event_available</span>
+            </div>
+            <div>
+              <h3 class="panel-title" style="font-size: 1.05rem;">Maintenance Access Protocol</h3>
+              <span style="font-size: 0.72rem; color: var(--secondary);">Office & Laboratory Access Window</span>
+            </div>
+          </div>
+
+          <p style="font-size: 0.8rem; color: var(--secondary); margin: 0; line-height: 1.4;">
+            Specify time slots when technicians may enter private offices or assigned research labs without disturbing active lectures or student consultations.
+          </p>
+
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <div style="background: var(--surface-low); border-radius: var(--radius-md); padding: 0.65rem; display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span class="material-symbols-outlined" style="font-size: 18px; color: var(--accent-blue);">calendar_today</span>
+                <div style="display: flex; flex-direction: column;">
+                  <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);">Mon & Wed</span>
+                  <span style="font-size: 0.75rem; color: var(--secondary);">02:00 PM – 04:00 PM</span>
+                </div>
+              </div>
+              <span style="font-size: 0.7rem; font-weight: 700; background: #fff; border: 1px solid var(--border); padding: 0.15rem 0.5rem; border-radius: var(--radius-sm); color: var(--secondary);">Office Hours</span>
+            </div>
+
+            <div style="background: var(--surface-low); border-radius: var(--radius-md); padding: 0.65rem; display: flex; align-items: center; justify-content: space-between;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span class="material-symbols-outlined" style="font-size: 18px; color: var(--accent-blue);">calendar_today</span>
+                <div style="display: flex; flex-direction: column;">
+                  <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);">Friday</span>
+                  <span style="font-size: 0.75rem; color: var(--secondary);">10:00 AM – 12:00 PM</span>
+                </div>
+              </div>
+              <span style="font-size: 0.7rem; font-weight: 700; background: #fff; border: 1px solid var(--border); padding: 0.15rem 0.5rem; border-radius: var(--radius-sm); color: var(--secondary);">Research Block</span>
+            </div>
+          </div>
+
+          <div style="background: var(--surface-low); border-radius: var(--radius-md); padding: 0.75rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
+            <div style="display: flex; flex-direction: column;">
+              <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);">Master Security Key Access</span>
+              <span style="font-size: 0.72rem; color: var(--secondary);">Allow access with security escort</span>
+            </div>
+            <input type="checkbox" id="masterKeyToggle" checked style="width: 18px; height: 18px; cursor: pointer;">
+          </div>
+        </div>
+
+        <!-- Subsection E: Department Rapid Contacts -->
+        <div class="stitch-panel-card">
+          <div class="panel-header-row">
+            <h3 class="panel-title" style="font-size: 1.05rem;">
+              <span class="material-symbols-outlined" style="font-size: 18px; color: var(--accent-blue);">contact_phone</span>
+              <span>Department Rapid Contacts</span>
+            </h3>
+          </div>
+          <p style="font-size: 0.8rem; color: var(--secondary); margin: 0;">Urgent dispatch hotlines for immediate response:</p>
+
+          <div style="display: flex; flex-direction: column; gap: 0.35rem;">
+            <a href="tel:4410" style="display: flex; align-items: center; justify-content: space-between; padding: 0.65rem; border-radius: var(--radius-md); text-decoration: none; color: var(--text-main); background: var(--surface-low); transition: background 0.15s ease;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span class="material-symbols-outlined" style="font-size: 18px; color: var(--secondary);">desktop_windows</span>
+                <span style="font-size: 0.82rem; font-weight: 600;">AV Rapid Response Desk</span>
+              </div>
+              <span class="stitch-badge" style="background: #d8e2ff; color: #004395;">Ext. 4410</span>
+            </a>
+
+            <a href="tel:4418" style="display: flex; align-items: center; justify-content: space-between; padding: 0.65rem; border-radius: var(--radius-md); text-decoration: none; color: var(--text-main); background: var(--surface-low); transition: background 0.15s ease;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span class="material-symbols-outlined" style="font-size: 18px; color: var(--secondary);">science</span>
+                <span style="font-size: 0.82rem; font-weight: 600;">CS Lab Coordinator</span>
+              </div>
+              <span class="stitch-badge" style="background: #d8e2ff; color: #004395;">Ext. 4418</span>
+            </a>
+
+            <a href="tel:5500" style="display: flex; align-items: center; justify-content: space-between; padding: 0.65rem; border-radius: var(--radius-md); text-decoration: none; color: var(--text-main); background: var(--surface-low); transition: background 0.15s ease;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span class="material-symbols-outlined" style="font-size: 18px; color: var(--secondary);">domain</span>
+                <span style="font-size: 0.82rem; font-weight: 600;">Central Facilities Hotline</span>
+              </div>
+              <span class="stitch-badge" style="background: #d8e2ff; color: #004395;">Ext. 5500</span>
+            </a>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+
   </main>
 
   <!-- Lecture-Critical Emergency Modal -->
   <div id="lectureCriticalModal" class="modal-overlay">
-    <div class="modal-box" style="border-top: 6px solid #dc2626;">
+    <div class="modal-box" style="border-top: 6px solid #dc2626; max-width: 600px;">
       <div class="modal-header">
-        <h3 class="modal-title" style="color: #b91c1c;">🚨 Lecture-Critical Urgent Intervention</h3>
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <div style="width: 36px; height: 36px; border-radius: var(--radius-md); background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-outlined" style="font-size: 20px;">fmd_bad</span>
+          </div>
+          <div>
+            <h3 class="modal-title" style="color: #b91c1c; margin: 0; font-size: 1.2rem;">🚨 Lecture-Critical Urgent Intervention</h3>
+            <p style="font-size: 0.8rem; color: var(--secondary); margin: 2px 0 0 0;">
+              Active class halted due to hardware breakdown. <strong>15-minute rapid AV dispatch target active.</strong>
+            </p>
+          </div>
+        </div>
         <button class="close-btn" onclick="closeLectureCriticalModal()">&times;</button>
       </div>
 
-      <p style="font-size: 0.85rem; color: #475569; margin-bottom: 1rem;">
-        Use this emergency form if an active class is halted due to hardware/power breakdown. Dispatches an instant priority alert with a <strong>15-minute response SLA</strong>.
-      </p>
+      <div id="lcModalFeedback" class="modal-feedback-banner error" style="display: none;" role="alert"></div>
 
       <form id="lectureCriticalForm">
         <div class="form-group">
-          <label class="form-label">Malfunction Summary</label>
-          <input type="text" id="lcTitle" class="form-control" placeholder="e.g. Smart projector bulb blown during class" required>
+          <label class="form-label" for="lcTitle">Malfunction Summary <span style="color: var(--danger);">*</span></label>
+          <input type="text" id="lcTitle" class="form-control" placeholder="e.g. Smart projector bulb blown during Thermodynamics lecture" required>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Lecture Hall / Room Number</label>
+          <label class="form-label" for="lcLocation">Lecture Hall / Room Number <span style="color: var(--danger);">*</span></label>
           <input type="text" id="lcLocation" class="form-control" placeholder="e.g. Aryabhata Block, Lecture Hall 201" required>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
           <div class="form-group">
-            <label class="form-label">Department</label>
+            <label class="form-label" for="lcDept">Department <span style="color: var(--danger);">*</span></label>
             <select id="lcDept" class="form-control" required></select>
           </div>
           <div class="form-group">
-            <label class="form-label">System Affected</label>
+            <label class="form-label" for="lcTrade">System Affected <span style="color: var(--danger);">*</span></label>
             <select id="lcTrade" class="form-control" required>
               <option value="IT">💻 Projector / Audio / PC</option>
               <option value="ELECTRICAL">⚡ Power Cut / AC Failure</option>
@@ -105,13 +478,13 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Immediate Impact Details</label>
-          <textarea id="lcDesc" class="form-control" rows="2" placeholder="e.g. 60 students in hall; visual slides interrupted" required></textarea>
+          <label class="form-label" for="lcDesc">Immediate Impact Details <span style="color: var(--danger);">*</span></label>
+          <textarea id="lcDesc" class="form-control" rows="3" placeholder="e.g. 65 students waiting in hall; visual slides and interactive podium interrupted" required></textarea>
         </div>
 
         <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
           <button type="button" class="btn btn-outline" onclick="closeLectureCriticalModal()">Cancel</button>
-          <button type="submit" class="btn btn-danger">Trigger 15m Urgent Dispatch</button>
+          <button type="submit" id="lcSubmitBtn" class="btn btn-danger" style="padding: 0.65rem 1.4rem; font-weight: 700;">Trigger 15m Urgent Dispatch</button>
         </div>
       </form>
     </div>
@@ -119,30 +492,42 @@
 
   <!-- Faculty Room Maintenance Modal (100% Student-Private) -->
   <div id="facultyRoomModal" class="modal-overlay">
-    <div class="modal-box" style="border-top: 6px solid #9333ea;">
+    <div class="modal-box" style="border-top: 6px solid #9333ea; max-width: 620px;">
       <div class="modal-header">
-        <h3 class="modal-title" style="color: #6b21a8;">☕ Faculty Room & Cabin Maintenance</h3>
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <div style="width: 36px; height: 36px; border-radius: var(--radius-md); background: #ede9fe; color: #7e22ce; display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-outlined" style="font-size: 20px;">meeting_room</span>
+          </div>
+          <div>
+            <h3 class="modal-title" style="color: #6b21a8; margin: 0; font-size: 1.2rem;">☕ Faculty Room & Cabin Maintenance</h3>
+            <p style="font-size: 0.8rem; color: var(--secondary); margin: 2px 0 0 0;">
+              Confidential work order. <strong>Guaranteed hidden from all student feeds.</strong>
+            </p>
+          </div>
+        </div>
         <button class="close-btn" onclick="closeFacultyRoomModal()">&times;</button>
       </div>
 
-      <div class="badge badge-assigned" style="width: 100%; margin-bottom: 1rem; padding: 0.5rem; justify-content: flex-start;">
-        🔒 Student Privacy Guaranteed: This complaint will NEVER appear on student feeds.
+      <div class="badge" style="background: #f3e8ff; color: #6b21a8; border: 1px solid #d8b4fe; width: 100%; margin-bottom: 1rem; padding: 0.6rem; justify-content: flex-start; text-transform: none; font-size: 0.82rem;">
+        🔒 Student Privacy Guaranteed: This complaint will NEVER appear on student portals or campus feeds.
       </div>
+
+      <div id="frModalFeedback" class="modal-feedback-banner error" style="display: none;" role="alert"></div>
 
       <form id="facultyRoomForm">
         <div class="form-group">
-          <label class="form-label">Issue Title</label>
-          <input type="text" id="frTitle" class="form-control" placeholder="e.g. Heavy-duty printer toner empty / Cabin AC water dripping" required>
+          <label class="form-label" for="frTitle">Issue Title <span style="color: var(--danger);">*</span></label>
+          <input type="text" id="frTitle" class="form-control" placeholder="e.g. Heavy-duty printer paper jam / Staff Cabin AC dripping" required>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Department / Faculty Wing</label>
+          <label class="form-label" for="frDept">Department / Faculty Wing <span style="color: var(--danger);">*</span></label>
           <select id="frDept" class="form-control" required></select>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
           <div class="form-group">
-            <label class="form-label">Faculty Amenity Category</label>
+            <label class="form-label" for="frTrade">Faculty Amenity Category <span style="color: var(--danger);">*</span></label>
             <select id="frTrade" class="form-control" required>
               <option value="IT">🖨️ Staff Printer / Scanner / LAN</option>
               <option value="ELECTRICAL">⚡ Cabin AC / Fan / Socket</option>
@@ -153,30 +538,131 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">Teacher Free Slot (Available Time)</label>
+            <label class="form-label" for="frSlot">Teacher Free Slot (Available Time) <span style="color: var(--danger);">*</span></label>
             <input type="text" id="frSlot" class="form-control" placeholder="e.g. 1:30 PM - 3:00 PM (Lunch)" required>
             <div class="form-hint">Technician will visit only during this window.</div>
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Staff Cabin / Lounge Location</label>
+          <label class="form-label" for="frLocation">Staff Cabin / Lounge Location <span style="color: var(--danger);">*</span></label>
           <input type="text" id="frLocation" class="form-control" placeholder="e.g. Law Faculty Room 202, Desk #4" required>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Details</label>
-          <textarea id="frDesc" class="form-control" rows="2" placeholder="Describe the amenity problem..." required></textarea>
+          <label class="form-label" for="frDesc">Details <span style="color: var(--danger);">*</span></label>
+          <textarea id="frDesc" class="form-control" rows="3" placeholder="Describe the amenity problem and equipment affected..." required></textarea>
         </div>
 
         <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
           <button type="button" class="btn btn-outline" onclick="closeFacultyRoomModal()">Cancel</button>
-          <button type="submit" class="btn btn-primary" style="background: #9333ea;">File Private Staff Ticket</button>
+          <button type="submit" id="frSubmitBtn" class="btn btn-primary" style="background: #9333ea; padding: 0.65rem 1.4rem;">File Private Staff Ticket</button>
         </div>
       </form>
     </div>
   </div>
 
+  <!-- Resolution Sign-Off Modal -->
+  <div id="verifyModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="verifyModalTitle">
+    <div class="modal-box" style="max-width: 520px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <div style="width: 36px; height: 36px; border-radius: var(--radius-md); background: #d1fae5; color: #065f46; display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-outlined" style="font-size: 20px;">verified</span>
+          </div>
+          <div>
+            <h3 class="modal-title" id="verifyModalTitle" style="margin: 0; font-size: 1.2rem;">Sign Off on Completed Repair</h3>
+            <p style="font-size: 0.8rem; color: var(--secondary); margin: 2px 0 0 0;">
+              Confirm that the classroom/facility repair was completed satisfactorily.
+            </p>
+          </div>
+        </div>
+        <button class="close-btn" type="button" onclick="closeVerifyModal()" aria-label="Close dialog">&times;</button>
+      </div>
+
+      <div id="verifyModalFeedback" class="modal-feedback-banner error" style="display: none;" role="alert"></div>
+
+      <div class="form-group">
+        <label class="form-label" for="verifyRating">Rate Workmanship Quality (1 to 5 Stars)</label>
+        <select id="verifyRating" class="form-control">
+          <option value="5" selected>⭐⭐⭐⭐⭐ Excellent (5 Stars - Full Resolution)</option>
+          <option value="4">⭐⭐⭐⭐ Good (4 Stars)</option>
+          <option value="3">⭐⭐⭐ Satisfactory (3 Stars)</option>
+          <option value="2">⭐⭐ Poor (2 Stars)</option>
+          <option value="1">⭐ Unacceptable (1 Star)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="verifyComment">Faculty Feedback Comments (Optional)</label>
+        <textarea id="verifyComment" class="form-control" rows="3" placeholder="e.g. Tested with HDMI audio passthrough; acoustics clear."></textarea>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.25rem;">
+        <button class="btn btn-outline" type="button" onclick="closeVerifyModal()">Close</button>
+        <button class="btn btn-success" type="button" id="verifySubmitBtn" onclick="submitTeacherVerification()">Approve & Close Ticket</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Work Order Rework / Reopen Modal -->
+  <div id="reopenModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="reopenModalTitle">
+    <div class="modal-box" style="border-top: 6px solid #dc2626; max-width: 520px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <div style="width: 36px; height: 36px; border-radius: var(--radius-md); background: #fee2e2; color: #dc2626; display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-outlined" style="font-size: 20px;">restart_alt</span>
+          </div>
+          <div>
+            <h3 class="modal-title" id="reopenModalTitle" style="color: #b91c1c; margin: 0; font-size: 1.2rem;">Request Work Order Rework</h3>
+            <p style="font-size: 0.8rem; color: var(--secondary); margin: 2px 0 0 0;">
+              Reject resolution and flag ticket for technician maintenance rework.
+            </p>
+          </div>
+        </div>
+        <button class="close-btn" type="button" onclick="closeReopenModal()" aria-label="Close dialog">&times;</button>
+      </div>
+
+      <div id="reopenModalFeedback" class="modal-feedback-banner error" style="display: none;" role="alert"></div>
+
+      <form id="reopenForm">
+        <div class="form-group">
+          <label class="form-label" for="reopenReason">Specific Rework Instructions <span style="color: var(--danger);">*</span></label>
+          <textarea id="reopenReason" class="form-control" rows="3" placeholder="Explain what remains unresolved or requires immediate rework (e.g. HDMI port still loose)..." required></textarea>
+          <div class="form-hint">Technician will receive this feedback and priority will escalate to HIGH.</div>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.25rem;">
+          <button class="btn btn-outline" type="button" onclick="closeReopenModal()">Cancel</button>
+          <button class="btn btn-danger" type="submit" id="reopenSubmitBtn" style="padding: 0.65rem 1.4rem; font-weight: 700;">
+            Confirm Rework & Reopen
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Stitch Footer -->
+  <footer class="stitch-footer">
+    <div class="stitch-footer-inner">
+      <div style="display: flex; flex-direction: column; gap: 0.2rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-weight: 700; color: var(--primary);">CampusFix</span>
+          <span style="color: var(--secondary);">| College Issue & Grievance Management System</span>
+        </div>
+        <span>Faculty Self-Service Portal. © State University Facilities & Academic Operations.</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--success); font-weight: 600;">
+        <span class="live-dot"></span>
+        <span>System Operational</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="stitch-toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Scripts -->
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/teacher.js"></script>
