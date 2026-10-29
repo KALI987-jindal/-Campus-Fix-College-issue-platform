@@ -4,102 +4,463 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Student Portal — CampusFix</title>
+  <!-- Google Fonts: Plus Jakarta Sans & Material Symbols Outlined -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/dashboard.css">
 </head>
-<body>
+<body style="background: var(--bg-main); min-height: 100vh; display: flex; flex-direction: column;">
 
-  <!-- Top Navigation -->
-  <header class="navbar">
-    <div class="container nav-wrapper">
-      <a href="student-dashboard.html" class="brand-logo">
-        <span>🏫 CampusFix</span>
-        <span class="brand-badge" id="navUserDept">My Department</span>
+  <!-- Sticky Top Navigation -->
+  <header class="stitch-navbar">
+    <div class="stitch-nav-inner">
+      <!-- Brand Logo -->
+      <a href="student-dashboard.html" class="stitch-nav-brand">
+        <div class="stitch-brand-icon">
+          <span class="material-symbols-outlined" style="font-size: 22px;">school</span>
+        </div>
+        <div class="stitch-brand-text">
+          <span class="stitch-brand-title">CampusFix</span>
+          <span class="stitch-brand-subtitle">Student Portal</span>
+        </div>
       </a>
 
-      <div class="nav-user">
-        <div class="user-badge">
-          <span id="navUserName">Student Name</span>
-          <span class="user-role-tag" id="navUserRole">STUDENT</span>
+      <!-- Navigation Tabs (Stitch Style) -->
+      <nav class="stitch-nav-links" id="navTabsContainer">
+        <button class="stitch-nav-link active" id="tabAllIssues" type="button">
+          <span class="material-symbols-outlined" style="font-size: 18px;">dashboard</span>
+          <span>Dashboard</span>
+        </button>
+        <button class="stitch-nav-link" id="tabMyDept" type="button">
+          <span class="material-symbols-outlined" style="font-size: 18px;">apartment</span>
+          <span>My Department</span>
+        </button>
+        <button class="stitch-nav-link" id="tabCampusWide" type="button">
+          <span class="material-symbols-outlined" style="font-size: 18px;">public</span>
+          <span>Campus Common</span>
+        </button>
+        <button class="stitch-nav-link" id="tabMyReports" type="button">
+          <span class="material-symbols-outlined" style="font-size: 18px;">person_outline</span>
+          <span>My Complaints</span>
+        </button>
+        <button class="stitch-nav-link" id="tabSuggestions" type="button">
+          <span class="material-symbols-outlined" style="font-size: 18px;">recommend</span>
+          <span>Suggestions</span>
+        </button>
+      </nav>
+
+      <!-- Right Utility Actions -->
+      <div class="stitch-nav-actions">
+        <!-- Help Desk Quick Link -->
+        <a href="tel:5550199" class="stitch-nav-link" style="display: none; @media(min-width: 768px){display: inline-flex;}">
+          <span class="material-symbols-outlined" style="font-size: 18px;">help_center</span>
+          <span>Help Desk</span>
+        </a>
+
+        <!-- Notifications Bell -->
+        <div style="position: relative; display: flex; align-items: center;">
+          <button class="stitch-nav-link" type="button" aria-label="Notifications" style="padding: 0.45rem; border-radius: var(--radius-md);">
+            <span class="material-symbols-outlined" style="font-size: 20px;">notifications</span>
+          </button>
+          <span id="notifBadge" style="position: absolute; top: 0; right: 0; background: var(--danger); color: #fff; font-size: 10px; font-weight: 700; border-radius: 9999px; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;">•</span>
         </div>
-        <button id="logoutBtn" class="btn btn-outline btn-sm">Logout</button>
+
+        <div style="height: 24px; width: 1px; background: var(--border);"></div>
+
+        <!-- Student Profile Pill -->
+        <div class="stitch-nav-user">
+          <div class="stitch-user-info">
+            <span class="stitch-user-name" id="navUserName">Student Name</span>
+            <span class="stitch-user-dept" id="navUserDept">My Department</span>
+            <!-- Hidden role tag kept for backward compatibility -->
+            <span id="navUserRole" style="display: none;">STUDENT</span>
+          </div>
+          <div class="stitch-user-avatar">
+            <span class="material-symbols-outlined" style="font-size: 18px;">person</span>
+          </div>
+        </div>
+
+        <!-- Logout Button -->
+        <button id="logoutBtn" class="btn btn-outline btn-sm" title="Log out of session">
+          <span class="material-symbols-outlined" style="font-size: 16px;">logout</span>
+          <span style="font-size: 0.8rem;">Logout</span>
+        </button>
       </div>
     </div>
   </header>
 
-  <main class="container" style="padding-top: 1.5rem; padding-bottom: 3rem;">
-    <!-- Broadcast Notice Banner -->
+  <!-- Main Container -->
+  <main class="container" style="max-width: 1280px; margin: 0 auto; padding: 1.5rem 1.5rem 3rem 1.5rem; flex: 1;">
+
+    <!-- Broadcast Notice Banner (Dynamic via API) -->
     <div id="broadcastBanner" class="broadcast-banner" style="display: none;">
-      <span class="broadcast-icon">📢</span>
-      <div class="broadcast-content">
+      <div class="broadcast-icon">📢</div>
+      <div class="broadcast-content" style="flex: 1;">
         <h4 id="broadcastTitle">Campus Notice</h4>
         <p id="broadcastMsg">Maintenance announcement description.</p>
       </div>
+      <button onclick="document.getElementById('broadcastBanner').style.display='none'" style="background: transparent; border: none; color: #fff; opacity: 0.7; cursor: pointer; font-size: 1.25rem;">&times;</button>
     </div>
 
-    <!-- Dashboard Header -->
-    <div class="dashboard-header">
-      <div>
-        <h1 class="dashboard-title">Student Grievance & Issue Feed</h1>
-        <p class="dashboard-subtitle">
-          View issues in your faculty, upvote shared campus problems, or file a new maintenance request.
-        </p>
+    <!-- Welcome & Greeting Section -->
+    <section class="stitch-welcome-section">
+      <div class="stitch-welcome-row">
+        <div class="stitch-welcome-content">
+          <div class="stitch-welcome-badges">
+            <span class="term-badge">Active Academic Term • Spring 2026</span>
+            <span class="live-badge">
+              <span class="live-dot"></span> System Live
+            </span>
+          </div>
+          <h1 class="stitch-welcome-title">
+            Welcome back, <span id="welcomeStudentName">Student</span>!
+          </h1>
+          <p class="stitch-welcome-desc">
+            Report infrastructure problems, track real-time resolution stages, and vote for shared campus improvements.
+            <span class="stitch-dept-highlight" id="studentDeptSubtitle">Computer Science & Engineering</span>
+          </p>
+        </div>
+
+        <!-- Action Button Group -->
+        <div style="display: flex; gap: 0.75rem; align-items: center; flex-shrink: 0;">
+          <button class="stitch-btn-primary" id="openModalBtn" onclick="openReportModal()" type="button">
+            <span class="material-symbols-outlined" style="font-size: 20px;">add_circle</span>
+            <span>+ Report an Issue</span>
+          </button>
+        </div>
       </div>
-      <div>
-        <button class="btn btn-primary" onclick="openReportModal()">+ Report an Issue</button>
+
+      <!-- Quick Search & Filter Utility Toolbar -->
+      <div class="stitch-search-toolbar">
+        <div class="stitch-search-input-wrapper">
+          <span class="material-symbols-outlined stitch-search-icon">search</span>
+          <input type="text" id="searchIssuesInput" class="stitch-search-input" placeholder="Search issues, tickets, buildings, labs, or campus facilities...">
+        </div>
+        <div class="stitch-filter-group">
+          <select id="filterPriority" class="stitch-filter-select">
+            <option value="ALL">All Priority Levels</option>
+            <option value="CRITICAL">Critical Priority</option>
+            <option value="HIGH">High Priority</option>
+            <option value="MEDIUM">Medium Priority</option>
+            <option value="LOW">Low Priority</option>
+          </select>
+
+          <select id="filterScope" class="stitch-filter-select">
+            <option value="ALL">Scope: All Campus</option>
+            <option value="DEPARTMENT_ONLY">My Department</option>
+            <option value="CAMPUS_WIDE">Common Shared Amenities</option>
+            <option value="MY_REPORTS">My Reported Complaints</option>
+          </select>
+
+          <button id="resetFiltersBtn" class="stitch-filter-btn" title="Reset Filters" type="button">
+            <span class="material-symbols-outlined" style="font-size: 18px;">tune</span>
+          </button>
+        </div>
       </div>
+    </section>
+
+    <!-- Metric Summary Cards Grid (Calculated Strictly From Real API Data) -->
+    <section class="stitch-kpi-grid">
+      <!-- Card 1: My Reported Issues -->
+      <div class="stitch-kpi-card" id="kpiCardMyIssues" style="cursor: pointer;">
+        <div class="kpi-card-top">
+          <div>
+            <div class="kpi-card-label">My Reported Issues</div>
+            <div class="kpi-card-number" id="kpiMyIssuesCount">0</div>
+          </div>
+          <div class="kpi-card-icon navy">
+            <span class="material-symbols-outlined" style="font-size: 24px;">assignment_late</span>
+          </div>
+        </div>
+        <div class="kpi-card-bottom">
+          <span id="kpiMyIssuesSubtext">0 Under Review</span>
+          <span class="kpi-status-tag active" id="kpiMyIssuesBadge">0 Active</span>
+        </div>
+      </div>
+
+      <!-- Card 2: In Progress -->
+      <div class="stitch-kpi-card" id="kpiCardInProgress">
+        <div class="kpi-card-top">
+          <div>
+            <div class="kpi-card-label">In Progress</div>
+            <div class="kpi-card-number blue" id="kpiInProgressCount">0</div>
+          </div>
+          <div class="kpi-card-icon blue">
+            <span class="material-symbols-outlined" style="font-size: 24px;">engineering</span>
+          </div>
+        </div>
+        <div class="kpi-card-bottom">
+          <span id="kpiInProgressSubtext">Assigned Technicians</span>
+          <span class="kpi-status-tag active" id="kpiInProgressBadge">Active Fixes</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Resolved Tickets -->
+      <div class="stitch-kpi-card" id="kpiCardResolved">
+        <div class="kpi-card-top">
+          <div>
+            <div class="kpi-card-label">Resolved Tickets</div>
+            <div class="kpi-card-number green" id="kpiResolvedCount">0</div>
+          </div>
+          <div class="kpi-card-icon green">
+            <span class="material-symbols-outlined" style="font-size: 24px;">task_alt</span>
+          </div>
+        </div>
+        <div class="kpi-card-bottom">
+          <span id="kpiResolvedSubtext">Awaiting / Verified</span>
+          <span class="kpi-status-tag success">Completed</span>
+        </div>
+      </div>
+
+      <!-- Card 4: My Suggestions -->
+      <div class="stitch-kpi-card" id="kpiCardSuggestions" style="cursor: pointer;">
+        <div class="kpi-card-top">
+          <div>
+            <div class="kpi-card-label">Campus Suggestions</div>
+            <div class="kpi-card-number" id="kpiSuggestionsCount">0</div>
+          </div>
+          <div class="kpi-card-icon purple">
+            <span class="material-symbols-outlined" style="font-size: 24px;">lightbulb</span>
+          </div>
+        </div>
+        <div class="kpi-card-bottom">
+          <span id="kpiSuggestionsSubtext">Student Ideas</span>
+          <span class="kpi-status-tag active" id="kpiSuggestionsBadge">Senate Feed</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Two-Tier Main Grid Layout (8 cols Left / 4 cols Right) -->
+    <div class="stitch-main-grid">
+      <!-- Left Column: Department + Campus Wide Streams (8 cols) -->
+      <div class="stitch-feed-column">
+
+        <!-- Unified feed container for backward-compatibility if used -->
+        <div id="issuesFeedContainer" style="display: none;"></div>
+
+        <!-- Section 1: Department Issues Feed -->
+        <section id="deptSection" class="stitch-issues-section">
+          <!-- Section Header -->
+          <div class="stitch-section-header dept">
+            <div class="stitch-section-title-wrap">
+              <h2 class="stitch-section-title">
+                <span class="material-symbols-outlined" style="font-size: 20px; color: var(--primary);">apartment</span>
+                <span>Department Grievances: <span id="deptHeaderName">My Department</span></span>
+              </h2>
+              <p class="stitch-section-desc">
+                Issues reported in your academic department & labs. <em style="opacity: 0.85;">Confidential faculty offices are restricted from public feed.</em>
+              </p>
+            </div>
+            <span class="stitch-section-badge" id="deptActiveCountBadge">Loading...</span>
+          </div>
+
+          <!-- Department Issues List -->
+          <div id="deptIssuesContainer" class="stitch-issues-list">
+            <div style="text-align: center; padding: 2rem; color: var(--secondary);">Loading department complaints...</div>
+          </div>
+        </section>
+
+        <!-- Section 2: Campus-Wide Common Shared Amenities Feed -->
+        <section id="campusSection" class="stitch-issues-section" style="margin-top: 1.5rem;">
+          <!-- Section Header -->
+          <div class="stitch-section-header campus">
+            <div class="stitch-section-title-wrap">
+              <h2 class="stitch-section-title">
+                <span class="material-symbols-outlined" style="font-size: 20px; color: var(--accent-blue);">public</span>
+                <span>Campus Common Amenities & Shared Zones</span>
+              </h2>
+              <p class="stitch-section-desc">
+                Live tickets across University Library, Dining Central, Transit Hubs, Sports Facilities & Quad.
+              </p>
+            </div>
+            <span class="stitch-section-badge" id="campusActiveCountBadge">Public Campus Feed</span>
+          </div>
+
+          <!-- Campus-Wide Issues List -->
+          <div id="campusIssuesContainer" class="stitch-issues-list">
+            <div style="text-align: center; padding: 2rem; color: var(--secondary);">Loading campus-wide issues...</div>
+          </div>
+        </section>
+
+        <!-- Section 3: My Reported Complaints Feed (Shown when filtered or tab clicked) -->
+        <section id="myReportsSection" class="stitch-issues-section" style="display: none; margin-top: 1.5rem;">
+          <div class="stitch-section-header" style="background: #eef2ff; border: 1px solid #c7d2fe;">
+            <div class="stitch-section-title-wrap">
+              <h2 class="stitch-section-title">
+                <span class="material-symbols-outlined" style="font-size: 20px; color: var(--accent-blue);">person_outline</span>
+                <span>My Reported Complaints</span>
+              </h2>
+              <p class="stitch-section-desc">
+                Grievances filed by your student account. Track status updates and verify technician work proofs.
+              </p>
+            </div>
+            <span class="stitch-section-badge" id="myReportsCountBadge">0 Filed</span>
+          </div>
+
+          <div id="myReportsIssuesContainer" class="stitch-issues-list">
+            <!-- Populated via student.js -->
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Right Column: Campus Suggestions & Quick Guide (4 cols) -->
+      <aside class="stitch-sidebar-column">
+
+        <!-- Campus Suggestions Senate Panel -->
+        <div class="stitch-panel-card" id="suggestionsPanel">
+          <div class="panel-header-row">
+            <h2 class="panel-title">
+              <span class="material-symbols-outlined" style="font-size: 22px; color: var(--accent-blue);">recommend</span>
+              <span>Campus Suggestions</span>
+            </h2>
+            <span class="panel-badge">Senate Feed</span>
+          </div>
+
+          <div class="panel-info-note">
+            <span class="material-symbols-outlined" style="font-size: 16px; color: var(--accent-blue); flex-shrink: 0; margin-top: 2px;">info</span>
+            <span>Policy & facility upgrade ideas. Reviewed regularly by Student Welfare & University Planning.</span>
+          </div>
+
+          <!-- Dynamic Suggestions List -->
+          <div id="suggestionsContainer" style="display: flex; flex-direction: column; gap: 0.65rem;">
+            <div style="text-align: center; padding: 1.5rem; color: var(--secondary); font-size: 0.85rem;">Loading campus suggestions...</div>
+          </div>
+
+          <button id="openSuggestionBtn" class="stitch-btn-primary" style="background: var(--surface-container); color: var(--primary); justify-content: center; box-shadow: none;" type="button" onclick="openSuggestionModal()">
+            <span class="material-symbols-outlined" style="font-size: 18px;">add_comment</span>
+            <span>+ Propose a Campus Suggestion</span>
+          </button>
+        </div>
+
+        <!-- Campus Facilities Status Snapshot -->
+        <div class="stitch-panel-card">
+          <div class="panel-header-row">
+            <h3 class="panel-title">
+              <span class="material-symbols-outlined" style="font-size: 20px; color: var(--primary);">analytics</span>
+              <span>Campus Facilities Status</span>
+            </h3>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+            <div class="facility-row">
+              <span class="facility-name">Central Wi-Fi (Eduroam)</span>
+              <span class="facility-status online">
+                <span class="facility-dot green"></span> 99.8% Online
+              </span>
+            </div>
+            <div class="facility-row">
+              <span class="facility-name">Campus Shuttle Lines</span>
+              <span class="facility-status delay">
+                <span class="facility-dot amber"></span> Moderate Delay
+              </span>
+            </div>
+            <div class="facility-row">
+              <span class="facility-name">Dining Hall Facilities</span>
+              <span class="facility-status online">
+                <span class="facility-dot green"></span> Normal Ops
+              </span>
+            </div>
+            <div class="facility-row">
+              <span class="facility-name">Lab Equipment Power Grid</span>
+              <span class="facility-status online">
+                <span class="facility-dot green"></span> Operational
+              </span>
+            </div>
+          </div>
+
+          <div style="font-size: 0.72rem; color: var(--secondary); padding-top: 0.35rem; border-top: 1px solid #f1f5f9;">
+            Live telemetry updated by University Estates & Facilities.
+          </div>
+        </div>
+
+        <!-- Need Urgent Assistance Card -->
+        <div class="emergency-card">
+          <div class="emergency-header">
+            <span class="material-symbols-outlined" style="font-size: 22px; color: #fcd34d;">emergency</span>
+            <h4 class="emergency-title">Need Urgent Assistance?</h4>
+          </div>
+          <p class="emergency-desc">
+            For physical hazards, active water pipe bursts, or electrical dangers, contact the 24/7 Campus Control Room immediately.
+          </p>
+          <div class="emergency-btn-row">
+            <a href="tel:5550199" class="emergency-call-btn">
+              <span class="material-symbols-outlined" style="font-size: 16px;">call</span>
+              <span>Ext. 5500 / Helpdesk</span>
+            </a>
+            <span style="font-size: 0.72rem; color: #cbd5e1; font-weight: 600;">24/7 Available</span>
+          </div>
+        </div>
+
+      </aside>
     </div>
 
-    <!-- Two-Tier Feed Tabs -->
-    <div class="tabs-nav">
-      <button id="tabMyDept" class="tab-btn active">
-        <span>🏢 My Academic Department</span>
-      </button>
-      <button id="tabCampusWide" class="tab-btn">
-        <span>🌐 Central Campus (Library, Canteen, Buses)</span>
-      </button>
-    </div>
-
-    <!-- Issues Feed List -->
-    <div id="issuesFeedContainer" class="issues-feed">
-      <!-- Populated via student.js -->
-    </div>
   </main>
 
-  <!-- Report Issue Modal -->
+  <!-- Report Issue Modal (Stitch Styled with Real-Time Duplicate Warning) -->
   <div id="reportModal" class="modal-overlay">
-    <div class="modal-box">
+    <div class="modal-box" style="max-width: 620px;">
       <div class="modal-header">
-        <h3 class="modal-title">Submit a Maintenance Request</h3>
-        <button class="close-btn" onclick="closeReportModal()">&times;</button>
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <div style="width: 36px; height: 36px; border-radius: var(--radius-md); background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-outlined" style="font-size: 20px;">report_problem</span>
+          </div>
+          <div>
+            <h3 class="modal-title" style="margin: 0; font-size: 1.2rem;">Report a Campus Issue</h3>
+            <p style="font-size: 0.8rem; color: var(--secondary); margin: 2px 0 0 0;">
+              Submit a maintenance request. Assigned technicians receive real-time ticket logs.
+            </p>
+          </div>
+        </div>
+        <button class="close-btn" id="closeModalBtn" onclick="closeReportModal()">&times;</button>
       </div>
 
       <form id="reportIssueForm">
+        <!-- Issue Title -->
         <div class="form-group">
-          <label class="form-label">Issue Title</label>
-          <input type="text" id="issueTitle" class="form-control" placeholder="Brief summary of the fault" required>
+          <label class="form-label" for="issueTitle">Issue Title <span style="color: var(--danger);">*</span></label>
+          <input type="text" id="issueTitle" class="form-control" placeholder="e.g. Broken ceiling lamp in Computer Lab 302" required autocomplete="off">
         </div>
 
+        <!-- Real-Time Duplicate Warning Box -->
+        <div id="duplicateWarningBox" class="duplicate-warning-box" style="display: none;">
+          <span class="material-symbols-outlined">warning</span>
+          <div style="flex: 1;">
+            <strong style="display: block; margin-bottom: 2px;">Similar Existing Issue Detected:</strong>
+            <span id="duplicateWarningText">An open ticket with similar keywords already exists.</span>
+            <div style="margin-top: 6px;">
+              <button type="button" id="duplicateViewBtn" class="btn btn-sm btn-outline" style="background: #fff; font-size: 0.75rem; padding: 0.2rem 0.5rem;">
+                View & Upvote Existing Ticket
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scope & Visibility -->
         <div class="form-group">
-          <label class="form-label">Scope & Visibility</label>
+          <label class="form-label" for="issueScope">Scope & Visibility <span style="color: var(--danger);">*</span></label>
           <select id="issueScope" class="form-control" required>
-            <option value="DEPARTMENT_ONLY">Department Specific (Only my faculty peers & teachers)</option>
-            <option value="CAMPUS_WIDE">Central Campus (Shared Canteen, Library, Buses, Hostels)</option>
+            <option value="DEPARTMENT_ONLY">My Department (Only my faculty peers & teachers)</option>
+            <option value="CAMPUS_WIDE">Central Campus (Shared Library, Canteen, Buses, Hostels)</option>
           </select>
           <div class="form-hint">Note: Faculty room tickets are private to teachers and cannot be filed by students.</div>
         </div>
 
+        <!-- Department / Faculty -->
         <div class="form-group">
-          <label class="form-label">Department / Faculty</label>
+          <label class="form-label" for="issueDepartment">Department / Faculty <span style="color: var(--danger);">*</span></label>
           <select id="issueDepartment" class="form-control" required>
             <!-- Populated via API -->
           </select>
         </div>
 
+        <!-- Category & Priority Row -->
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
           <div class="form-group">
-            <label class="form-label">Trade / Category</label>
+            <label class="form-label" for="issueTrade">Trade / Category <span style="color: var(--danger);">*</span></label>
             <select id="issueTrade" class="form-control" required>
               <option value="ELECTRICAL">⚡ Electrical & AC</option>
               <option value="PLUMBING">🔧 Plumbing & Water</option>
@@ -112,7 +473,7 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">Urgency Priority</label>
+            <label class="form-label" for="issuePriority">Urgency Priority <span style="color: var(--danger);">*</span></label>
             <select id="issuePriority" class="form-control" required>
               <option value="LOW">Low (Cosmetic)</option>
               <option value="MEDIUM" selected>Medium (Standard)</option>
@@ -122,26 +483,33 @@
           </div>
         </div>
 
+        <!-- Location -->
         <div class="form-group">
-          <label class="form-label">Exact Location (Block, Floor, Room No.)</label>
+          <label class="form-label" for="issueLocation">Exact Location (Block, Floor, Room No.) <span style="color: var(--danger);">*</span></label>
           <input type="text" id="issueLocation" class="form-control" placeholder="e.g. Science Block, Room 204 or Canteen 1st floor" required>
         </div>
 
+        <!-- Detailed Description -->
         <div class="form-group">
-          <label class="form-label">Detailed Description</label>
-          <textarea id="issueDesc" class="form-control" rows="3" placeholder="Provide full details of the malfunction..." required></textarea>
+          <label class="form-label" for="issueDesc">Detailed Description <span style="color: var(--danger);">*</span></label>
+          <textarea id="issueDesc" class="form-control" rows="3" placeholder="Provide full details of the malfunction, equipment impacted, and safety hazards..." required></textarea>
         </div>
 
-        <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
-          <input type="checkbox" id="issueAnonymous">
-          <label for="issueAnonymous" style="font-size: 0.85rem; cursor: pointer;">
-            Report Anonymously (Hide my name on public feeds)
-          </label>
+        <!-- Anonymous Checkbox -->
+        <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; padding: 0.65rem 0.85rem; background: var(--surface-low); border-radius: var(--radius-md);">
+          <div>
+            <label for="issueAnonymous" style="font-size: 0.875rem; font-weight: 600; cursor: pointer; display: block; color: var(--text-main);">
+              Report Anonymously
+            </label>
+            <span style="font-size: 0.78rem; color: var(--secondary);">Hide your student name from public student feeds</span>
+          </div>
+          <input type="checkbox" id="issueAnonymous" style="width: 18px; height: 18px; cursor: pointer;">
         </div>
 
+        <!-- Action Buttons -->
         <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
-          <button type="button" class="btn btn-outline" onclick="closeReportModal()">Cancel</button>
-          <button type="submit" class="btn btn-primary">Submit Ticket</button>
+          <button type="button" class="btn btn-outline" id="cancelModalBtn" onclick="closeReportModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1.4rem;">Submit Grievance Ticket</button>
         </div>
       </form>
     </div>
@@ -149,14 +517,24 @@
 
   <!-- Resolution Verification Modal -->
   <div id="verifyModal" class="modal-overlay">
-    <div class="modal-box">
+    <div class="modal-box" style="max-width: 520px;">
       <div class="modal-header">
-        <h3 class="modal-title">Verify & Rate Completed Fix</h3>
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <div style="width: 36px; height: 36px; border-radius: var(--radius-md); background: #d1fae5; color: #065f46; display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-outlined" style="font-size: 20px;">verified</span>
+          </div>
+          <div>
+            <h3 class="modal-title" style="margin: 0; font-size: 1.2rem;">Verify & Rate Completed Fix</h3>
+            <p style="font-size: 0.8rem; color: var(--secondary); margin: 2px 0 0 0;">
+              Confirm that the reported issue has been repaired satisfactorily.
+            </p>
+          </div>
+        </div>
         <button class="close-btn" onclick="closeVerifyModal()">&times;</button>
       </div>
 
       <div class="form-group">
-        <label class="form-label">Rate Quality of Repair (1 to 5 Stars)</label>
+        <label class="form-label" for="verifyRating">Rate Quality of Repair (1 to 5 Stars)</label>
         <select id="verifyRating" class="form-control">
           <option value="5">⭐⭐⭐⭐⭐ Excellent (5 Stars)</option>
           <option value="4">⭐⭐⭐⭐ Good (4 Stars)</option>
@@ -167,17 +545,94 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">Feedback Comments (Optional)</label>
-        <textarea id="verifyComment" class="form-control" rows="2" placeholder="Was the work done cleanly?"></textarea>
+        <label class="form-label" for="verifyComment">Feedback Comments (Optional)</label>
+        <textarea id="verifyComment" class="form-control" rows="3" placeholder="Was the work done cleanly and promptly?"></textarea>
       </div>
 
       <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.25rem;">
-        <button class="btn btn-outline" onclick="closeVerifyModal()">Close</button>
-        <button class="btn btn-success" onclick="submitVerification()">Confirm & Close Ticket</button>
+        <button class="btn btn-outline" type="button" onclick="closeVerifyModal()">Close</button>
+        <button class="btn btn-success" type="button" onclick="submitVerification()">Confirm & Close Ticket</button>
       </div>
     </div>
   </div>
 
+  <!-- Submit Suggestion Modal -->
+  <div id="suggestionModal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 540px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <div style="width: 36px; height: 36px; border-radius: var(--radius-md); background: #ede9fe; color: #6d28d9; display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-outlined" style="font-size: 20px;">lightbulb</span>
+          </div>
+          <div>
+            <h3 class="modal-title" style="margin: 0; font-size: 1.2rem;">Propose a Campus Suggestion</h3>
+            <p style="font-size: 0.8rem; color: var(--secondary); margin: 2px 0 0 0;">
+              Share ideas to improve student facilities, library access, or campus policies.
+            </p>
+          </div>
+        </div>
+        <button class="close-btn" onclick="closeSuggestionModal()">&times;</button>
+      </div>
+
+      <form id="suggestionForm" onsubmit="handleCreateSuggestion(event)">
+        <div class="form-group">
+          <label class="form-label" for="suggestionTitle">Suggestion Title <span style="color: var(--danger);">*</span></label>
+          <input type="text" id="suggestionTitle" class="form-control" placeholder="e.g. Extend 24/7 Library Quiet Zone hours during Midterms" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="suggestionCategory">Category <span style="color: var(--danger);">*</span></label>
+          <select id="suggestionCategory" class="form-control" required>
+            <option value="INFRASTRUCTURE">Campus Infrastructure & Facilities</option>
+            <option value="ACADEMICS">Academic & Library Resources</option>
+            <option value="CANTEEN">Dining & Canteen Services</option>
+            <option value="TRANSIT">Campus Bus & Transportation</option>
+            <option value="SPORTS">Sports, Recreation & Grounds</option>
+            <option value="GENERAL">General Welfare & Policies</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="suggestionDesc">Detailed Proposal <span style="color: var(--danger);">*</span></label>
+          <textarea id="suggestionDesc" class="form-control" rows="3" placeholder="Explain the proposal, student benefits, and suggested implementation..." required></textarea>
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; padding: 0.65rem 0.85rem; background: var(--surface-low); border-radius: var(--radius-md);">
+          <div>
+            <label for="suggestionAnonymous" style="font-size: 0.875rem; font-weight: 600; cursor: pointer; display: block; color: var(--text-main);">
+              Submit Anonymously
+            </label>
+            <span style="font-size: 0.78rem; color: var(--secondary);">Hide your student name on senate suggestion feeds</span>
+          </div>
+          <input type="checkbox" id="suggestionAnonymous" style="width: 18px; height: 18px; cursor: pointer;">
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.25rem;">
+          <button type="button" class="btn btn-outline" onclick="closeSuggestionModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1.4rem;">Submit Proposal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Stitch Footer -->
+  <footer class="stitch-footer">
+    <div class="stitch-footer-inner">
+      <div style="display: flex; flex-direction: column; gap: 0.2rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-weight: 700; color: var(--primary);">CampusFix</span>
+          <span style="color: var(--secondary);">| College Issue & Grievance Management System</span>
+        </div>
+        <span>Student Self-Service Portal. © State University Facilities & Academic Operations.</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--success); font-weight: 600;">
+        <span class="live-dot"></span>
+        <span>System Operational</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/student.js"></script>

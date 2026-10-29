@@ -139,6 +139,25 @@ class ApiClient {
     });
   }
 
+  // Suggestions (Student Senate & Campus Improvements)
+  static async getSuggestions(params = {}) {
+    const query = new URLSearchParams(params).toString();
+    return this.request(`/suggestions${query ? `?${query}` : ""}`);
+  }
+
+  static async createSuggestion(suggestionData) {
+    return this.request("/suggestions", {
+      method: "POST",
+      body: JSON.stringify(suggestionData)
+    });
+  }
+
+  static async toggleSuggestionUpvote(suggestionId) {
+    return this.request(`/suggestions/${suggestionId}/upvote`, {
+      method: "POST"
+    });
+  }
+
   // Staff / Supervisor / Technician Operations
   static async getTechnicians(trade = null) {
     const query = trade ? `?trade=${trade}` : "";
