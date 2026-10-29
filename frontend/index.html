@@ -3,264 +3,849 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CampusFix — Multi-Department College Issue Platform</title>
+  <title>CampusFix — University Issue & Grievance Portal</title>
+
+  <!-- Stitch Design Typography & Material Symbols Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/dashboard.css">
+
   <style>
-    .hero-section {
-      text-align: center;
-      padding: 3.5rem 1rem 2rem 1rem;
+    /* ── Stitch Civic Collegiate: Login Specific Styles ── */
+
+    /* Layout Container & Background Accents */
+    .login-page-wrapper {
+      position: relative;
+      overflow-x: hidden;
+      min-height: calc(100vh - 68px);
+      padding: 2.5rem 0 3.5rem 0;
     }
-    .hero-title {
-      font-size: 2.75rem;
-      font-weight: 800;
-      color: #0f172a;
-      letter-spacing: -0.02em;
-      margin-bottom: 0.75rem;
+
+    .ambient-blur-1 {
+      position: absolute;
+      top: -3rem;
+      left: -5rem;
+      width: 24rem;
+      height: 24rem;
+      border-radius: 9999px;
+      background: rgba(216, 226, 255, 0.45);
+      filter: blur(64px);
+      pointer-events: none;
+      z-index: 0;
     }
-    .hero-title span {
-      color: var(--primary);
+
+    .ambient-blur-2 {
+      position: absolute;
+      top: 35%;
+      right: -6rem;
+      width: 22rem;
+      height: 22rem;
+      border-radius: 9999px;
+      background: rgba(218, 226, 253, 0.5);
+      filter: blur(64px);
+      pointer-events: none;
+      z-index: 0;
     }
-    .hero-desc {
-      font-size: 1.15rem;
-      color: var(--secondary);
-      max-width: 720px;
-      margin: 0 auto 2rem auto;
-    }
-    .faculties-strip {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.5rem;
+
+    /* Hero / Context Anchor */
+    .login-hero {
+      position: relative;
+      z-index: 1;
       margin-bottom: 2.5rem;
     }
-    .faculty-pill {
-      background: #ffffff;
-      border: 1px solid var(--border);
+
+    .official-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
       padding: 0.35rem 0.85rem;
       border-radius: var(--radius-full);
+      background: var(--bg-subtle);
+      color: var(--primary);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 0.75rem;
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 9999px;
+      background: var(--accent-blue);
+      box-shadow: 0 0 0 0 rgba(0, 88, 190, 0.7);
+      animation: pulse-ring 2s infinite cubic-bezier(0.45, 0, 0.2, 1);
+    }
+
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 88, 190, 0.6); }
+      70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(0, 88, 190, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 88, 190, 0); }
+    }
+
+    .hero-headline {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-subtext {
+      font-size: 1.05rem;
+      color: var(--secondary);
+      max-width: 760px;
+      line-height: 1.5;
+    }
+
+    /* Two-Column Responsive Grid */
+    .login-layout-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 2.25rem;
+      align-items: start;
+    }
+
+    @media (max-width: 1024px) {
+      .login-layout-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+      .hero-headline {
+        font-size: 2rem;
+      }
+    }
+
+    /* Left Column: Role Selection */
+    .role-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 1rem;
+      padding-bottom: 0.25rem;
+    }
+
+    .role-section-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 0.2rem;
+    }
+
+    .role-section-subtitle {
+      font-size: 0.84rem;
+      color: var(--secondary);
+    }
+
+    .role-count-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      background: var(--accent-blue-light);
+      padding: 0.25rem 0.65rem;
+      border-radius: var(--radius-full);
+      white-space: nowrap;
+    }
+
+    .role-cards-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    /* Interactive Role Card */
+    .role-card {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.1rem 1.25rem;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+      user-select: none;
+    }
+
+    .role-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: #93c5fd;
+    }
+
+    .role-card.active {
+      border: 2px solid var(--border-focus);
+      background: #f8fafc;
+      box-shadow: var(--shadow-md);
+    }
+
+    .role-card-left {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      min-width: 0;
+    }
+
+    .role-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-subtle);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+
+    .role-card:hover .role-icon-box,
+    .role-card.active .role-icon-box {
+      background: var(--primary);
+      color: #ffffff;
+    }
+
+    .role-card-content {
+      min-width: 0;
+    }
+
+    .role-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.25rem;
+    }
+
+    .role-card-title {
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .role-card-pill {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.15rem 0.5rem;
+      border-radius: var(--radius-full);
+      background: var(--bg-subtle);
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .role-card.active .role-card-pill {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .role-card-desc {
+      font-size: 0.83rem;
+      color: var(--secondary);
+      line-height: 1.4;
+    }
+
+    /* Radio Indicator */
+    .role-radio {
+      width: 24px;
+      height: 24px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      transition: all 0.15s ease;
+    }
+
+    .radio-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: var(--radius-full);
+      background: var(--border);
+    }
+
+    .role-radio.checked {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+    }
+
+    /* Right Column: Authentication Card */
+    .auth-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+    }
+
+    .auth-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .auth-card-title {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -0.015em;
+    }
+
+    .active-role-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-top: 0.35rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+    }
+
+    .auth-lock-circle {
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-full);
+      background: var(--bg-subtle);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Form Fields with Inner Icons */
+    .form-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.35rem;
+    }
+
+    .forgot-link {
+      font-size: 0.78rem;
+      color: var(--secondary);
+      font-weight: 600;
+    }
+
+    .input-with-icon {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 0.85rem;
+      color: var(--text-light);
+      font-size: 20px;
+      pointer-events: none;
+    }
+
+    .input-icon-padding {
+      padding-left: 2.65rem !important;
+      padding-right: 2.65rem !important;
+      height: 44px;
+      font-size: 0.9rem;
+    }
+
+    .password-toggle-btn {
+      position: absolute;
+      right: 0.65rem;
+      background: transparent;
+      border: none;
+      color: var(--text-light);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.25rem;
+      border-radius: var(--radius-xs);
+    }
+
+    .password-toggle-btn:hover {
+      color: var(--primary);
+    }
+
+    .form-remember-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0.75rem 0 1.25rem 0;
+    }
+
+    .remember-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.83rem;
+      color: var(--secondary);
+      cursor: pointer;
+    }
+
+    .remember-checkbox {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .btn-submit-full {
+      width: 100%;
+      height: 44px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-demo-instant {
+      width: 100%;
+      min-height: 42px;
+      margin-top: 0.75rem;
+      background: var(--bg-subtle);
+      border: 1px solid #bfdbfe;
+      color: var(--accent-blue);
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-demo-instant:hover {
+      background: var(--accent-blue-light);
+      border-color: var(--accent-blue);
+      transform: translateY(-1px);
+    }
+
+    /* SSO Partition Divider */
+    .sso-partition {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 1.5rem 0 1rem 0;
+    }
+
+    .sso-line {
+      width: 100%;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .sso-text {
+      position: absolute;
+      background: #ffffff;
+      padding: 0 0.75rem;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .security-footnote {
+      margin-top: 1.5rem;
+      padding: 0.75rem 0.9rem;
+      background: var(--bg-subtle);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .footnote-icon {
+      font-size: 18px;
+      color: var(--success);
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+
+    .footnote-text {
+      font-size: 0.75rem;
+      color: var(--secondary);
+      line-height: 1.4;
+    }
+
+    /* Top Bar Header Additions */
+    .brand-icon {
+      font-size: 24px;
+      color: var(--primary);
+    }
+
+    .brand-name {
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .portal-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
       font-size: 0.82rem;
       font-weight: 600;
       color: var(--secondary);
-      box-shadow: var(--shadow-sm);
     }
-    .auth-card-container {
-      max-width: 460px;
-      margin: 0 auto 3rem auto;
+
+    .portal-info .info-icon,
+    .portal-info .help-icon {
+      font-size: 18px;
+      color: var(--accent-blue);
     }
-    .demo-showcase-box {
-      background: #ffffff;
-      border: 2px dashed #93c5fd;
-      border-radius: var(--radius-lg);
-      padding: 1.5rem;
-      margin: 2rem auto;
-      max-width: 860px;
+
+    .portal-info .divider {
+      color: var(--border);
     }
-    .demo-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 0.75rem;
-      margin-top: 1rem;
-    }
-    .demo-btn {
-      text-align: left;
-      padding: 0.75rem 1rem;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
-      background: var(--bg-main);
-      cursor: pointer;
-      transition: all 0.15s ease;
-      display: flex;
-      flex-direction: column;
-    }
-    .demo-btn:hover {
-      background: var(--primary-light);
-      border-color: var(--primary);
-      transform: translateY(-2px);
-    }
-    .demo-role {
-      font-weight: 700;
-      font-size: 0.9rem;
-      color: var(--text-main);
-    }
-    .demo-email {
-      font-size: 0.76rem;
-      color: var(--text-muted);
-      margin-top: 0.15rem;
+
+    @media (max-width: 768px) {
+      .hidden-sm {
+        display: none !important;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Bar -->
+  <!-- Top Bar Navbar -->
   <header class="navbar">
     <div class="container nav-wrapper">
       <a href="index.html" class="brand-logo">
-        <span>🏫 CampusFix</span>
-        <span class="brand-badge">Multi-Faculty HLD</span>
+        <span class="material-symbols-outlined brand-icon">school</span>
+        <span class="brand-name">CampusFix</span>
+        <span class="brand-badge">Official Portal</span>
       </a>
-      <div>
+
+      <div class="nav-right">
+        <div class="portal-info hidden-sm">
+          <span class="material-symbols-outlined info-icon">domain</span>
+          <span>State University System</span>
+          <span class="divider">|</span>
+          <span class="material-symbols-outlined help-icon">support_agent</span>
+          <span>Viva Ready (college123)</span>
+        </div>
         <button class="btn btn-outline btn-sm" onclick="openRegisterModal()">Create Account</button>
       </div>
     </div>
   </header>
 
-  <!-- Hero Section -->
-  <main class="container">
-    <section class="hero-section">
-      <h1 class="hero-title">Unified College Issue & <span>Grievance Platform</span></h1>
-      <p class="hero-desc">
-        Zero-clutter department isolation for Engineering, Law, Dental, Physiotherapy & Sciences, with 15-minute lecture-critical alerts, private faculty rooms, and hybrid ground worker dispatch.
-      </p>
+  <!-- Main Login Page Section -->
+  <main class="container login-page-wrapper">
+    <!-- Ambient university architectural backdrop accents -->
+    <div class="ambient-blur-1"></div>
+    <div class="ambient-blur-2"></div>
 
-      <!-- Faculty Tags -->
-      <div class="faculties-strip">
-        <span class="faculty-pill">⚙️ Engineering</span>
-        <span class="faculty-pill">⚖️ Law</span>
-        <span class="faculty-pill">🦷 Dental</span>
-        <span class="faculty-pill">🏃 Physiotherapy</span>
-        <span class="faculty-pill">🔬 Sciences (BSc/MSc)</span>
-        <span class="faculty-pill">🎓 Masters (PG)</span>
-        <span class="faculty-pill">🧪 Ph.D. Research</span>
-        <span class="faculty-pill">🌐 Central Campus</span>
+    <!-- Header / Context Anchor -->
+    <section class="login-hero">
+      <div class="official-pill">
+        <span class="pulse-dot"></span>
+        <span>Official University Facilities &amp; Academic Redressal System</span>
       </div>
+      <h1 class="hero-headline">A Better Campus Starts Here.</h1>
+      <p class="hero-subtext">
+        Report issues, track resolutions, and help build a seamless campus experience across facilities, classrooms, and residences.
+      </p>
     </section>
 
-    <!-- Standard Login Box -->
-    <div class="auth-card-container">
-      <div class="card">
-        <h3 style="margin-bottom: 0.5rem; font-size: 1.25rem;">Sign In to Portal</h3>
-        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">
-          Enter your institutional credentials to access your scoped feed.
-        </p>
+    <!-- Two-Column Layout (Roles on Left, Authentication on Right) -->
+    <div class="login-layout-grid">
 
-        <div id="loginError" class="badge badge-sla-breached" style="display: none; width: 100%; margin-bottom: 1rem; padding: 0.5rem;"></div>
-
-        <form id="loginForm">
-          <div class="form-group">
-            <label class="form-label" for="loginEmail">Institutional Email</label>
-            <input type="email" id="loginEmail" class="form-control" placeholder="name@college.edu" required>
+      <!-- LEFT COLUMN: Role Selection (7 Columns / 1.25fr) -->
+      <section class="role-selection-col">
+        <div class="role-section-header">
+          <div>
+            <h2 class="role-section-title">Select Your Campus Role</h2>
+            <p class="role-section-subtitle">Choose your affiliation to route directly to your personalized workspace.</p>
           </div>
-          <div class="form-group">
-            <label class="form-label" for="loginPassword">Password</label>
-            <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+          <span class="role-count-badge">
+            <span class="material-symbols-outlined" style="font-size: 15px;">touch_app</span>
+            <span>5 Verified Roles</span>
+          </span>
+        </div>
+
+        <div class="role-cards-stack" id="roleCardsGroup">
+          <!-- Role 1: Student (Default Selected) -->
+          <div class="role-card active" data-role-key="student" onclick="selectRole('student')">
+            <div class="role-card-left">
+              <div class="role-icon-box">
+                <span class="material-symbols-outlined">school</span>
+              </div>
+              <div class="role-card-content">
+                <div class="role-card-header">
+                  <h3 class="role-card-title">Student</h3>
+                  <span class="role-card-pill">Self-Service Portal</span>
+                </div>
+                <p class="role-card-desc">
+                  Lodge dorm, classroom, library, or campus amenity complaints and track updates in real-time.
+                </p>
+              </div>
+            </div>
+            <div class="role-radio checked">
+              <span class="material-symbols-outlined" style="font-size: 16px; font-weight: bold;">check</span>
+            </div>
           </div>
-          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">Login to Dashboard</button>
-        </form>
-      </div>
-    </div>
 
-    <!-- 1-Click Viva Demo Box -->
-    <div class="demo-showcase-box">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <h4 style="font-size: 1.1rem; color: #1e3a8a;">⚡ 1-Click Viva Demo Login Accounts</h4>
-          <p style="font-size: 0.82rem; color: var(--text-muted);">
-            Click any role below to instantly log in and experience that role's isolated feed and features. (Password: <code>college123</code>)
-          </p>
-        </div>
-        <span class="badge badge-assigned">Examiner Ready</span>
-      </div>
+          <!-- Role 2: Teacher / Faculty -->
+          <div class="role-card" data-role-key="teacher" onclick="selectRole('teacher')">
+            <div class="role-card-left">
+              <div class="role-icon-box">
+                <span class="material-symbols-outlined">co_present</span>
+              </div>
+              <div class="role-card-content">
+                <div class="role-card-header">
+                  <h3 class="role-card-title">Teacher / Faculty</h3>
+                  <span class="role-card-pill">Priority Academic Routing</span>
+                </div>
+                <p class="role-card-desc">
+                  Report laboratory equipment, smart-board, lecture hall, or private staff room amenity concerns.
+                </p>
+              </div>
+            </div>
+            <div class="role-radio">
+              <span class="radio-dot"></span>
+            </div>
+          </div>
 
-      <div class="demo-grid">
-        <!-- Student Engg -->
-        <div class="demo-btn" onclick="quickDemoLogin('student.engg@college.edu')">
-          <span class="demo-role">👨‍🎓 Engineering Student</span>
-          <span class="demo-email">student.engg@college.edu (Sees Workshop & Engg Labs)</span>
-        </div>
+          <!-- Role 3: Maintenance Supervisor -->
+          <div class="role-card" data-role-key="supervisor" onclick="selectRole('supervisor')">
+            <div class="role-card-left">
+              <div class="role-icon-box">
+                <span class="material-symbols-outlined">assignment_turned_in</span>
+              </div>
+              <div class="role-card-content">
+                <div class="role-card-header">
+                  <h3 class="role-card-title">Maintenance Supervisor</h3>
+                  <span class="role-card-pill">Operations Management</span>
+                </div>
+                <p class="role-card-desc">
+                  Dispatch work orders, assign ground technicians, monitor SLA deadlines, and verify completed fixes.
+                </p>
+              </div>
+            </div>
+            <div class="role-radio">
+              <span class="radio-dot"></span>
+            </div>
+          </div>
 
-        <!-- Student Law -->
-        <div class="demo-btn" onclick="quickDemoLogin('student.law@college.edu')">
-          <span class="demo-role">⚖️ Law Student</span>
-          <span class="demo-email">student.law@college.edu (Sees Moot Court & Legal Labs)</span>
-        </div>
+          <!-- Role 4: Ground Staff / Technician -->
+          <div class="role-card" data-role-key="technician" onclick="selectRole('technician')">
+            <div class="role-card-left">
+              <div class="role-icon-box">
+                <span class="material-symbols-outlined">home_repair_service</span>
+              </div>
+              <div class="role-card-content">
+                <div class="role-card-header">
+                  <h3 class="role-card-title">Ground Staff / Technician</h3>
+                  <span class="role-card-pill">Field Execution</span>
+                </div>
+                <p class="role-card-desc">
+                  View assigned tickets, update job status, and upload photo proof to verify completed repairs.
+                </p>
+              </div>
+            </div>
+            <div class="role-radio">
+              <span class="radio-dot"></span>
+            </div>
+          </div>
 
-        <!-- Student Physio -->
-        <div class="demo-btn" onclick="quickDemoLogin('student.physio@college.edu')">
-          <span class="demo-role">🏃 Physiotherapy Student</span>
-          <span class="demo-email">student.physio@college.edu (Sees Rehab & Electrotherapy)</span>
+          <!-- Role 5: Dean / Administrator -->
+          <div class="role-card" data-role-key="admin" onclick="selectRole('admin')">
+            <div class="role-card-left">
+              <div class="role-icon-box">
+                <span class="material-symbols-outlined">account_balance</span>
+              </div>
+              <div class="role-card-content">
+                <div class="role-card-header">
+                  <h3 class="role-card-title">Dean / Administrator</h3>
+                  <span class="role-card-pill">Executive Oversight</span>
+                </div>
+                <p class="role-card-desc">
+                  Oversee university-wide grievance metrics, department performance, safety compliance, and audit logs.
+                </p>
+              </div>
+            </div>
+            <div class="role-radio">
+              <span class="radio-dot"></span>
+            </div>
+          </div>
         </div>
+      </section>
 
-        <!-- Teacher Engg -->
-        <div class="demo-btn" onclick="quickDemoLogin('teacher.engg@college.edu')">
-          <span class="demo-role">👩‍🏫 Teacher (Engineering)</span>
-          <span class="demo-email">teacher.engg@college.edu (Has 15-min Lecture Alert)</span>
-        </div>
+      <!-- RIGHT COLUMN: University Authentication Card (5 Columns / 1fr) -->
+      <section class="auth-card-col">
+        <div class="card auth-card">
+          <!-- Card Header -->
+          <div class="auth-card-header">
+            <div>
+              <h2 class="auth-card-title">Sign In</h2>
+              <div class="active-role-pill">
+                <span class="material-symbols-outlined" style="font-size: 16px;">verified_user</span>
+                <span id="active-role-display">Role: Student (Selected)</span>
+              </div>
+            </div>
+            <div class="auth-lock-circle">
+              <span class="material-symbols-outlined">lock</span>
+            </div>
+          </div>
 
-        <!-- Teacher Law (Faculty Room) -->
-        <div class="demo-btn" onclick="quickDemoLogin('teacher.law@college.edu')">
-          <span class="demo-role">☕ Teacher (Law — Staff Room)</span>
-          <span class="demo-email">teacher.law@college.edu (Sees Private Faculty Room Printer)</span>
-        </div>
+          <!-- Login Error Box -->
+          <div id="loginError" class="badge badge-sla-breached" style="display: none; width: 100%; margin-bottom: 1rem; padding: 0.65rem 0.9rem; text-align: left; font-size: 0.82rem;"></div>
 
-        <!-- Estate Supervisor -->
-        <div class="demo-btn" onclick="quickDemoLogin('supervisor.civil@college.edu')">
-          <span class="demo-role">👷 Estate Supervisor (JE)</span>
-          <span class="demo-email">supervisor.civil@college.edu (Dispatches Carpenters/Plumbers)</span>
-        </div>
+          <!-- Standard Login Form -->
+          <form id="loginForm">
+            <!-- Email / ID Input -->
+            <div class="form-group">
+              <label class="form-label" for="loginEmail">College ID / University Email</label>
+              <div class="input-with-icon">
+                <span class="material-symbols-outlined input-icon">badge</span>
+                <input type="email" id="loginEmail" class="form-control input-icon-padding" placeholder="e.g., student.engg@college.edu" value="student.engg@college.edu" required>
+              </div>
+            </div>
 
-        <!-- Technician Plumber -->
-        <div class="demo-btn" onclick="quickDemoLogin('plumber.suresh@college.edu')">
-          <span class="demo-role">🔧 Plumber Suresh (Ground Staff)</span>
-          <span class="demo-email">plumber.suresh@college.edu (1-Click Mobile Task UI)</span>
-        </div>
+            <!-- Password Input -->
+            <div class="form-group">
+              <div class="form-label-row">
+                <label class="form-label" for="loginPassword" style="margin-bottom: 0;">Password</label>
+                <span class="forgot-link" title="Viva demo password is: college123">Default: college123</span>
+              </div>
+              <div class="input-with-icon">
+                <span class="material-symbols-outlined input-icon">key</span>
+                <input type="password" id="loginPassword" class="form-control input-icon-padding" placeholder="••••••••••••" value="college123" required>
+                <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility()" aria-label="Toggle password visibility">
+                  <span class="material-symbols-outlined" id="passwordToggleIcon">visibility</span>
+                </button>
+              </div>
+            </div>
 
-        <!-- Central Dean / Admin -->
-        <div class="demo-btn" onclick="quickDemoLogin('dean.admin@college.edu')">
-          <span class="demo-role">🏛️ Dean / Super Admin</span>
-          <span class="demo-email">dean.admin@college.edu (Cross-Dept Analytics & Broadcasts)</span>
+            <!-- Remember Me -->
+            <div class="form-remember-row">
+              <label class="remember-label">
+                <input type="checkbox" checked class="remember-checkbox">
+                <span>Remember this device for 30 days</span>
+              </label>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary btn-submit-full" id="submitLoginBtn">
+              <span>Sign In to CampusFix</span>
+              <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
+            </button>
+
+            <!-- 1-Click Instant Demo Login Button -->
+            <button type="button" class="btn-demo-instant" id="instantDemoBtn" onclick="executeActiveRoleDemo()">
+              <span class="material-symbols-outlined" style="font-size: 18px;">bolt</span>
+              <span id="instantDemoText">1-Click Demo Login as Student</span>
+            </button>
+
+            <!-- Partition -->
+            <div class="sso-partition">
+              <div class="sso-line"></div>
+              <span class="sso-text">OR CREATE AN ACCOUNT</span>
+            </div>
+
+            <!-- Create Account Modal Trigger -->
+            <button type="button" class="btn btn-outline" style="width: 100%; min-height: 44px;" onclick="openRegisterModal()">
+              <span class="material-symbols-outlined" style="font-size: 18px;">person_add</span>
+              <span>Register New Institutional Account</span>
+            </button>
+          </form>
+
+          <!-- Security Footnote -->
+          <div class="security-footnote">
+            <span class="material-symbols-outlined footnote-icon">security</span>
+            <p class="footnote-text">
+              256-bit SSL encrypted institutional portal. Session access logs recorded under State University Digital Safety Policy.
+            </p>
+          </div>
         </div>
-      </div>
+      </section>
+
     </div>
   </main>
 
-  <!-- Registration Modal -->
+  <!-- Registration Modal (Full functional backend registration) -->
   <div id="registerModal" class="modal-overlay">
     <div class="modal-box">
       <div class="modal-header">
-        <h3 class="modal-title">Register New Account</h3>
+        <h3 class="modal-title" style="display: flex; align-items: center; gap: 0.5rem; font-weight: 800; color: var(--primary);">
+          <span class="material-symbols-outlined" style="color: var(--accent-blue);">badge</span>
+          <span>Register Institutional Account</span>
+        </h3>
         <button class="close-btn" onclick="closeRegisterModal()">&times;</button>
       </div>
 
-      <div id="regError" class="badge badge-sla-breached" style="display: none; width: 100%; margin-bottom: 1rem; padding: 0.5rem;"></div>
+      <div id="regError" class="badge badge-sla-breached" style="display: none; width: 100%; margin-bottom: 1rem; padding: 0.65rem 0.9rem; text-align: left; font-size: 0.82rem;"></div>
 
       <form id="registerForm">
         <div class="form-group">
-          <label class="form-label">Full Name</label>
+          <label class="form-label" for="regFullName">Full Name</label>
           <input type="text" id="regFullName" class="form-control" placeholder="e.g. Rahul Sharma" required>
         </div>
 
         <div class="form-group">
-          <label class="form-label">College Email</label>
+          <label class="form-label" for="regEmail">College Institutional Email</label>
           <input type="email" id="regEmail" class="form-control" placeholder="username@college.edu" required>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Password</label>
+          <label class="form-label" for="regPassword">Password</label>
           <input type="password" id="regPassword" class="form-control" placeholder="••••••••" required>
         </div>
 
         <div class="form-group">
-          <label class="form-label">User Role</label>
+          <label class="form-label" for="regRole">Campus Role</label>
           <select id="regRole" class="form-control" required>
             <option value="STUDENT">Student</option>
             <option value="TEACHER">Teacher / Faculty</option>
-            <option value="HOD">Department HOD</option>
-            <option value="SUPERVISOR">Estate Supervisor (JE)</option>
             <option value="TECHNICIAN">Ground Technician (Plumber/Carpenter/etc.)</option>
           </select>
+          <div class="form-hint">Note: HOD, Supervisor and Admin accounts are provisioned by university administration.</div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Academic Department</label>
+          <label class="form-label" for="regDepartment">Academic Department</label>
           <select id="regDepartment" class="form-control">
-            <!-- Populated via API -->
+            <!-- Populated dynamically via api.js -->
           </select>
         </div>
 
         <div class="form-group">
-          <label class="form-label">Designation / Year</label>
+          <label class="form-label" for="regDesignation">Designation / Academic Year</label>
           <input type="text" id="regDesignation" class="form-control" placeholder="e.g. B.Tech 3rd Year or Assistant Professor">
         </div>
 
@@ -274,10 +859,108 @@
 
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
+
   <script>
+    // Stitch Role Mapping Configuration
+    const roleConfig = {
+      student: {
+        title: 'Student',
+        email: 'student.engg@college.edu',
+        placeholder: 'e.g., student.engg@college.edu or ID2048'
+      },
+      teacher: {
+        title: 'Teacher / Faculty',
+        email: 'teacher.engg@college.edu',
+        placeholder: 'e.g., teacher.engg@college.edu or EMP992'
+      },
+      supervisor: {
+        title: 'Maintenance Supervisor',
+        email: 'supervisor.civil@college.edu',
+        placeholder: 'e.g., supervisor.civil@college.edu or SUP104'
+      },
+      technician: {
+        title: 'Ground Staff / Technician',
+        email: 'plumber.suresh@college.edu',
+        placeholder: 'e.g., plumber.suresh@college.edu or TECH08'
+      },
+      admin: {
+        title: 'Dean / Administrator',
+        email: 'dean.admin@college.edu',
+        placeholder: 'e.g., dean.admin@college.edu or ADM001'
+      }
+    };
+
+    let currentSelectedRoleKey = 'student';
+
+    function selectRole(key) {
+      currentSelectedRoleKey = key;
+      const cfg = roleConfig[key];
+      if (!cfg) return;
+
+      // Update active state of role cards
+      const cards = document.querySelectorAll('.role-card');
+      cards.forEach(card => {
+        const isMatch = card.getAttribute('data-role-key') === key;
+        card.classList.toggle('active', isMatch);
+
+        const radio = card.querySelector('.role-radio');
+        if (radio) {
+          if (isMatch) {
+            radio.className = 'role-radio checked';
+            radio.innerHTML = '<span class="material-symbols-outlined" style="font-size: 16px; font-weight: bold;">check</span>';
+          } else {
+            radio.className = 'role-radio';
+            radio.innerHTML = '<span class="radio-dot"></span>';
+          }
+        }
+      });
+
+      // Update right-column displays & pre-fills
+      const roleDisplay = document.getElementById('active-role-display');
+      if (roleDisplay) {
+        roleDisplay.textContent = 'Role: ' + cfg.title + ' (Selected)';
+      }
+
+      const emailInput = document.getElementById('loginEmail');
+      if (emailInput) {
+        emailInput.value = cfg.email;
+        emailInput.placeholder = cfg.placeholder;
+      }
+
+      const passInput = document.getElementById('loginPassword');
+      if (passInput) {
+        passInput.value = 'college123';
+      }
+
+      const demoBtnText = document.getElementById('instantDemoText');
+      if (demoBtnText) {
+        demoBtnText.textContent = '1-Click Demo Login as ' + cfg.title;
+      }
+    }
+
+    function executeActiveRoleDemo() {
+      const cfg = roleConfig[currentSelectedRoleKey] || roleConfig.student;
+      quickDemoLogin(cfg.email);
+    }
+
+    function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('loginPassword');
+      const toggleIcon = document.getElementById('passwordToggleIcon');
+      if (!passwordInput || !toggleIcon) return;
+
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.textContent = 'visibility_off';
+      } else {
+        passwordInput.type = 'password';
+        toggleIcon.textContent = 'visibility';
+      }
+    }
+
     function openRegisterModal() {
       document.getElementById('registerModal').classList.add('open');
     }
+
     function closeRegisterModal() {
       document.getElementById('registerModal').classList.remove('open');
     }

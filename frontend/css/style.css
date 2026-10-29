@@ -1,44 +1,98 @@
 /* ========================================================
    CampusFix Design System — Core Styles & CSS Variables
+   Aligned with the Stitch "Civic Collegiate" design system.
    ======================================================== */
+
+/* ── Google Font: Plus Jakarta Sans ─────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
 :root {
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
-  --primary-light: #eff6ff;
-  --secondary: #475569;
-  --success: #16a34a;
-  --success-light: #f0fdf4;
-  --warning: #d97706;
-  --warning-light: #fffbeb;
-  --danger: #dc2626;
-  --danger-light: #fef2f2;
-  --purple: #9333ea;
-  --purple-light: #faf5ff;
+  /* ── Brand colors (Stitch Civic Collegiate palette) ──── */
 
-  --bg-main: #f8fafc;
-  --bg-card: #ffffff;
-  --border: #e2e8f0;
-  --border-focus: #3b82f6;
+  /* Primary: deep institutional navy */
+  --primary:        #1b365d;   /* Stitch primary-container / DESIGN.md "Primary Navy" */
+  --primary-hover:  #0f2042;   /* DESIGN.md: "Hover shifts to #0F2042" */
+  --primary-light:  #d6e3ff;   /* Stitch primary-fixed — tinted surface for badges/bg */
+  --primary-dim:    #aec7f7;   /* Stitch primary-fixed-dim — lighter tint / inverse */
 
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --text-light: #94a3b8;
+  /* Secondary / supporting text (Muted Slate — Stitch on-surface-variant) */
+  --secondary:       #44474e;  /* Stitch on-surface-variant for body subtext & descriptions */
+  --secondary-hover: #131b2e;  /* Hover state for muted text / on-surface */
+  --secondary-light: #f2f3ff;  /* Stitch surface-container-low */
 
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --radius-full: 9999px;
+  /* Interactive action blue (Stitch secondary / action accent) */
+  --accent-blue:       #0058be;  /* Stitch secondary (Action Blue) */
+  --accent-blue-hover: #004395;  /* Stitch on-secondary-fixed-variant */
+  --accent-blue-light: #d8e2ff;  /* Stitch secondary-fixed */
 
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  /* Status — Stitch status hierarchy */
+  --success:        #065f46;   /* Resolved: on-tertiary-container (WCAG AA on white) */
+  --success-bg:     #ecfdf5;   /* Resolved background */
+  --success-light:  #f0fdf4;   /* Compat alias — resolved row bg (kept for existing JS) */
+
+  --warning:        #92400e;   /* In-Progress text */
+  --warning-bg:     #fffbeb;   /* In-Progress background */
+  --warning-light:  #fffbeb;   /* Compat alias */
+
+  --danger:         #ba1a1a;   /* Stitch error */
+  --danger-hover:   #93000a;   /* Stitch on-error-container */
+  --danger-light:   #ffdad6;   /* Stitch error-container */
+
+  /* Faculty-room / purple accent (kept for existing components) */
+  --purple:         #6b21a8;
+  --purple-light:   #faf5ff;
+
+  /* ── Surfaces & backgrounds ──────────────────────────── */
+  --bg-main:   #faf8ff;  /* Stitch background/surface — warm-white with violet tint */
+  --bg-card:   #ffffff;  /* Stitch surface-container-lowest — card white */
+  --bg-subtle: #f2f3ff;  /* Stitch surface-container-low — hover rows, sub-panels */
+
+  /* ── Borders ─────────────────────────────────────────── */
+  --border:        #e2e8f0;  /* Stitch Structural Lines (#E2E8F0) micro-border */
+  --border-subtle: #e2e7ff;  /* Stitch surface-container-high — dividers inside cards */
+  --border-focus:  #3b82f6;  /* Action & Focus Blue — unchanged per DESIGN.md spec */
+
+  /* ── Typography ──────────────────────────────────────── */
+  --font-sans:    'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont,
+                  'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+  --text-main:    #131b2e;   /* Stitch on-surface */
+  --text-muted:   #44474e;   /* Stitch on-surface-variant */
+  --text-light:   #74777f;   /* Stitch outline — lightest readable text */
+  --text-inverse: #eef0ff;   /* Stitch inverse-on-surface — text on dark bg */
+
+  /* ── Border radius (Stitch rounded scale) ────────────── */
+  --radius-xs:   4px;      /* Stitch rounded.sm (0.25rem) — tiny chips, dots */
+  --radius-sm:   8px;      /* Stitch rounded.DEFAULT (0.5rem) — buttons, inputs, badges */
+  --radius-md:   12px;     /* Stitch rounded.md (0.75rem) — cards, form panels */
+  --radius-lg:   16px;     /* Stitch rounded.xl (1rem) — modals, drawers */
+  --radius-full: 9999px;   /* Pill badges, avatars */
+
+  /* ── Elevation shadows (navy-tinted, per Stitch spec) ── */
+  /* Layer 1 — Cards, lists, panels */
+  --shadow-sm: 0 1px 3px 0 rgba(15, 32, 66, 0.04),
+               0 1px 2px -1px rgba(15, 32, 66, 0.02);
+  /* Layer 2 — Active / hover interactive state */
+  --shadow-md: 0 4px 6px -1px rgba(15, 32, 66, 0.06),
+               0 2px 4px -2px rgba(15, 32, 66, 0.04);
+  /* Layer 3 — Modals, overlays, floating banners */
+  --shadow-lg: 0 20px 25px -5px rgba(15, 32, 66, 0.08),
+               0 8px 10px -6px rgba(15, 32, 66, 0.04);
+
+  /* ── Spacing cadence (Stitch spacing scale) ──────────── */
+  --space-xs: 0.25rem;  /*  4px */
+  --space-sm: 0.5rem;   /*  8px */
+  --space-md: 1rem;     /* 16px */
+  --space-lg: 1.5rem;   /* 24px */
+  --space-xl: 2.5rem;   /* 40px */
 }
 
+/* ── Global reset & base typography ─────────────────────── */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-sans);
 }
 
 body {
