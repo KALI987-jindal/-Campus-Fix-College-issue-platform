@@ -268,12 +268,34 @@ def verify_resolution(
     db: Session = Depends(get_db)
 ):
     """
-    Student or Teacher sign-off on completed repair.
-    Action: ACCEPT (rate 1-5) or REOPEN.
+    Sign-off on a RESOLVED issue.  Action: ACCEPT (rate 1-5) or REOPEN.
+
+    Authorised callers (in priority order):
+      1. The original reporter of the issue (student or teacher who filed it).
+      2. Any TEACHER or HOD belonging to the same academic department as the issue
+         — preserves the faculty sign-off workflow (teacher.js 'Approve & Close' button).
+      3. ADMIN or SUPERVISOR — administrative override / quality control.
+
+    All other users receive HTTP 403 regardless of role.
     """
     issue = db.query(Issue).filter(Issue.id == issue_id).first()
     if not issue:
         raise HTTPException(status_code=404, detail="Issue not found")
+
+    # ── Authorization check ──────────────────────────────────────────────────
+    is_reporter = (current_user.id == issue.reported_by_user_id)
+    is_dept_faculty = (
+        current_user.role in ("TEACHER", "HOD")
+        and current_user.academic_department_id == issue.academic_department_id
+    )
+    is_admin_or_supervisor = current_user.role in ("ADMIN", "SUPERVISOR")
+
+    if not (is_reporter or is_dept_faculty or is_admin_or_supervisor):
+        raise HTTPException(
+            status_code=403,
+            detail="Not authorised: only the issue reporter, department faculty, or an administrator may verify this issue."
+        )
+    # ────────────────────────────────────────────────────────────────────────
 
     action = verify_data.action.upper()
     if action == "ACCEPT":

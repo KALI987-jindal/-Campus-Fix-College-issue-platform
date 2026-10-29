@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from .config import UPLOAD_DIR
 from .database import engine, Base, get_db
 from . import models
+from .models.issue import Issue  # explicit import — required by /health SLA checker
 from .routers import auth, departments, issues, staff, admin, suggestions
 from .services.auth_service import get_current_user
 

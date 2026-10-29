@@ -10,6 +10,18 @@ router = APIRouter(prefix="/api/v1/auth", tags=["Authentication"])
 
 @router.post("/register", response_model=TokenResponse)
 def register(user_in: UserRegister, db: Session = Depends(get_db)):
+    # Roles that any member of the public may self-assign.
+    # ADMIN, SUPERVISOR, and HOD require an administrator to create
+    # the account directly (via seed_data.py or a future admin endpoint).
+    SELF_REGISTERABLE_ROLES = {"STUDENT", "TEACHER", "TECHNICIAN"}
+    requested_role = user_in.role.upper()
+    if requested_role not in SELF_REGISTERABLE_ROLES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Role '{requested_role}' cannot be self-registered. "
+                   f"Allowed roles for public registration: {sorted(SELF_REGISTERABLE_ROLES)}."
+        )
+
     # Check if user already exists
     existing = db.query(User).filter(User.email == user_in.email.strip().lower()).first()
     if existing:
@@ -27,7 +39,7 @@ def register(user_in: UserRegister, db: Session = Depends(get_db)):
         full_name=user_in.full_name.strip(),
         email=user_in.email.strip().lower(),
         hashed_password=hash_password(user_in.password),
-        role=user_in.role.upper(),
+        role=requested_role,
         academic_department_id=user_in.academic_department_id,
         trade_specialty=user_in.trade_specialty.upper() if user_in.trade_specialty else None,
         designation=user_in.designation,

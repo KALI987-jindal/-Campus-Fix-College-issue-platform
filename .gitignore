@@ -1,4 +1,4 @@
-﻿.env
+.env
 .env.*
 !.env.example
 __pycache__/
@@ -14,3 +14,8 @@ build/
 uploads/
 .DS_Store
 Thumbs.db
+
+# Test execution logs & cache
+backend/_test_results.txt
+backend/test_output.txt
+.pytest_cache/
