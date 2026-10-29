@@ -134,28 +134,49 @@ def upload_proof(
     db: Session = Depends(get_db)
 ):
     """1-Click proof upload to verify completed repair and mark ticket as RESOLVED."""
+    clean_url = photo_url.strip() if photo_url else ""
+    if not clean_url:
+        raise HTTPException(status_code=400, detail="Photo proof reference URL is required")
+
     issue = db.query(Issue).filter(Issue.id == issue_id).first()
     if not issue:
         raise HTTPException(status_code=404, detail="Issue not found")
 
+    if issue.status == "CLOSED":
+        raise HTTPException(status_code=400, detail="Issue is already closed and signed off")
+
+    # Enforce technician task authorization
+    if current_user.role == "TECHNICIAN":
+        if issue.assigned_technician_id and issue.assigned_technician_id != current_user.id:
+            raise HTTPException(
+                status_code=403,
+                detail="Not authorised: this issue is assigned to a different technician."
+            )
+        if not issue.assigned_technician_id and issue.service_trade != current_user.trade_specialty:
+            raise HTTPException(
+                status_code=403,
+                detail=f"Not authorised: issue requires trade '{issue.service_trade}', but you are registered as '{current_user.trade_specialty}'."
+            )
+
     proof = ProofPhoto(
         issue_id=issue.id,
-        photo_url=photo_url,
+        photo_url=clean_url,
         photo_type=photo_type.upper(),
         uploaded_by_user_id=current_user.id
     )
     db.add(proof)
 
-    issue.resolution_proof_url = photo_url
+    issue.resolution_proof_url = clean_url
     issue.status = "RESOLVED"
     issue.resolved_at = datetime.utcnow()
     if resolution_note:
-        issue.resolution_note = resolution_note
+        issue.resolution_note = resolution_note.strip()
 
+    note_text = resolution_note.strip() if resolution_note else "Work completed"
     log = Comment(
         issue_id=issue.id,
         user_id=current_user.id,
-        message=f"[REPAIRED & RESOLVED]: Proof photo uploaded. Note: {resolution_note or 'Work completed'}",
+        message=f"[REPAIRED & RESOLVED]: Proof photo uploaded ({clean_url}). Note: {note_text}",
         is_staff_only_note=False
     )
     db.add(log)
@@ -164,6 +185,6 @@ def upload_proof(
     return {
         "message": "Resolution proof uploaded and marked RESOLVED",
         "issue_id": issue.id,
-        "proof_url": photo_url,
+        "proof_url": clean_url,
         "status": issue.status
     }

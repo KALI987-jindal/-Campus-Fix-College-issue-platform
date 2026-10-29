@@ -66,3 +66,45 @@ def test_supervisor_my_tasks(client, db, supervisor_user, technician_user, stude
     tasks = resp.json()
     assert isinstance(tasks, list)
     assert len(tasks) >= 1
+
+
+# ── Role Authorization Tests for Staff & Admin Routes ────────────────────────
+
+def test_my_tasks_unauthenticated_blocked(client):
+    """Unauthenticated access to staff my-tasks must return 401."""
+    resp = client.get("/api/v1/staff/my-tasks")
+    assert resp.status_code == 401
+
+
+def test_my_tasks_unauthorized_roles_blocked(client, student_a, teacher_same_dept, hod_user):
+    """STUDENT, TEACHER, and HOD roles must be forbidden from /api/v1/staff/my-tasks."""
+    for user in [student_a, teacher_same_dept, hod_user]:
+        resp = client.get("/api/v1/staff/my-tasks", headers=_auth_header(user))
+        assert resp.status_code == 403, f"Expected 403 for role {user.role}, got {resp.status_code}"
+
+
+def test_my_tasks_authorized_roles_allowed(client, technician_user, supervisor_user, admin_user):
+    """TECHNICIAN, SUPERVISOR, and ADMIN roles must be authorized for /api/v1/staff/my-tasks."""
+    for user in [technician_user, supervisor_user, admin_user]:
+        resp = client.get("/api/v1/staff/my-tasks", headers=_auth_header(user))
+        assert resp.status_code == 200, f"Expected 200 for role {user.role}, got {resp.status_code}"
+
+
+def test_admin_dashboard_unauthenticated_blocked(client):
+    """Unauthenticated access to /api/v1/admin/dashboard must return 401."""
+    resp = client.get("/api/v1/admin/dashboard")
+    assert resp.status_code == 401
+
+
+def test_admin_dashboard_unauthorized_roles_blocked(client, student_a, teacher_same_dept, technician_user):
+    """STUDENT, TEACHER, and TECHNICIAN roles must be forbidden from /api/v1/admin/dashboard."""
+    for user in [student_a, teacher_same_dept, technician_user]:
+        resp = client.get("/api/v1/admin/dashboard", headers=_auth_header(user))
+        assert resp.status_code == 403, f"Expected 403 for role {user.role}, got {resp.status_code}"
+
+
+def test_admin_dashboard_authorized_roles_allowed(client, admin_user, supervisor_user, hod_user):
+    """ADMIN, SUPERVISOR, and HOD roles must be authorized for /api/v1/admin/dashboard."""
+    for user in [admin_user, supervisor_user, hod_user]:
+        resp = client.get("/api/v1/admin/dashboard", headers=_auth_header(user))
+        assert resp.status_code == 200, f"Expected 200 for role {user.role}, got {resp.status_code}"

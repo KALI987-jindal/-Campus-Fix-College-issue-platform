@@ -182,6 +182,16 @@ class ApiClient {
     });
   }
 
+  static async uploadFile(file) {
+    if (!file) throw new Error("No file selected for upload.");
+    const formData = new FormData();
+    formData.append("file", file);
+    return this.request("/uploads", {
+      method: "POST",
+      body: formData
+    });
+  }
+
   static async uploadProof(issueId, photoUrl, note = null) {
     const formData = new FormData();
     formData.append("photo_url", photoUrl);

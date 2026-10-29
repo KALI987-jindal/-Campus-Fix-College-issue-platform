@@ -4,6 +4,38 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Executive Administration — CampusFix</title>
+  <script>
+    (function () {
+      try {
+        var token = localStorage.getItem("campus_fix_token");
+        var userStr = localStorage.getItem("campus_fix_user");
+        var user = userStr ? JSON.parse(userStr) : null;
+        var allowedRoles = ["ADMIN", "HOD", "SUPERVISOR"];
+        if (!token || !user) {
+          window.location.replace("index.html");
+          return;
+        }
+        var role = (user.role || "").toUpperCase();
+        if (!allowedRoles.includes(role)) {
+          if (role === "STUDENT") {
+            window.location.replace("student-dashboard.html");
+          } else if (role === "TEACHER") {
+            window.location.replace("teacher-dashboard.html");
+          } else if (role === "TECHNICIAN") {
+            window.location.replace("technician-workboard.html");
+          } else {
+            window.location.replace("index.html");
+          }
+        }
+      } catch (e) {
+        window.location.replace("index.html");
+      }
+    })();
+  </script>
+  <!-- Google Fonts: Plus Jakarta Sans & Material Symbols Outlined -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/dashboard.css">
@@ -14,172 +46,390 @@
       margin-top: 0.75rem;
     }
     .league-table th, .league-table td {
-      padding: 0.75rem 1rem;
+      padding: 0.85rem 1rem;
       border-bottom: 1px solid var(--border);
       text-align: left;
       font-size: 0.88rem;
     }
     .league-table th {
-      background: #f8fafc;
+      background: var(--surface-low);
       font-weight: 700;
-      color: var(--text-muted);
+      color: var(--secondary);
       text-transform: uppercase;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+    }
+    .league-table tr:hover td {
+      background: rgba(241, 245, 249, 0.6);
+    }
+    .admin-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+    @media (max-width: 1200px) {
+      .admin-kpi-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    @media (max-width: 768px) {
+      .admin-kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 480px) {
+      .admin-kpi-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .admin-layout-grid {
+      display: grid;
+      grid-template-columns: 1.8fr 1.2fr;
+      gap: 1.5rem;
+    }
+    @media (max-width: 960px) {
+      .admin-layout-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
-<body>
+<body style="background: var(--bg-main); min-height: 100vh; display: flex; flex-direction: column;">
 
-  <!-- Top Navigation -->
-  <header class="navbar">
-    <div class="container nav-wrapper">
-      <a href="admin-dashboard.html" class="brand-logo">
-        <span>🏫 CampusFix</span>
-        <span class="brand-badge" style="background: #eff6ff; color: #1d4ed8;">Dean & Executive Admin</span>
+  <!-- Sticky Top Navigation (Stitch Civic Collegiate Style) -->
+  <header class="stitch-navbar">
+    <div class="stitch-nav-inner">
+      <!-- Brand Logo -->
+      <a href="admin-dashboard.html" class="stitch-nav-brand">
+        <div class="stitch-brand-icon" style="background: #1e3a8a;">
+          <span class="material-symbols-outlined" style="font-size: 22px;">admin_panel_settings</span>
+        </div>
+        <div class="stitch-brand-text">
+          <span class="stitch-brand-title">CampusFix</span>
+          <span class="stitch-brand-subtitle" style="color: #1e3a8a;">Dean & Executive Admin</span>
+        </div>
       </a>
 
-      <div class="nav-user">
-        <div class="user-badge">
-          <span id="navUserName">Dean H.S. Bawa</span>
-          <span class="user-role-tag" id="navUserRole" style="background: #1e3a8a;">ADMIN</span>
+      <!-- Navigation Tabs (Stitch Style) -->
+      <nav class="stitch-nav-links" id="adminNavTabs">
+        <button class="stitch-nav-link active" id="tabOverview" type="button">
+          <span class="material-symbols-outlined" style="font-size: 18px;">analytics</span>
+          <span>Institutional Command</span>
+        </button>
+        <button class="stitch-nav-link" id="tabLeague" type="button">
+          <span class="material-symbols-outlined" style="font-size: 18px;">leaderboard</span>
+          <span>Faculty League</span>
+        </button>
+        <button class="stitch-nav-link" id="tabBroadcastsNav" type="button">
+          <span class="material-symbols-outlined" style="font-size: 18px;">campaign</span>
+          <span>Outage Bulletins</span>
+        </button>
+      </nav>
+
+      <!-- Right Utility Actions -->
+      <div class="stitch-nav-actions">
+        <!-- Live Status Pill -->
+        <div class="live-badge" style="background: #ecfdf5; color: #047857; padding: 0.35rem 0.75rem; border-radius: var(--radius-full); border: 1px solid #a7f3d0;">
+          <span class="live-dot"></span>
+          <span style="font-size: 0.75rem; font-weight: 700;">LIVE GOVERNANCE</span>
         </div>
-        <button id="logoutBtn" class="btn btn-outline btn-sm">Logout</button>
+
+        <div style="height: 24px; width: 1px; background: var(--border);"></div>
+
+        <!-- Executive User Pill -->
+        <div class="stitch-nav-user">
+          <div class="stitch-user-info">
+            <span class="stitch-user-name" id="navUserName">Dean H.S. Bawa</span>
+            <span class="stitch-user-dept" id="navUserDept">Executive Administration</span>
+            <span id="navUserRole" class="badge" style="display: none;">ADMIN</span>
+          </div>
+          <div class="stitch-user-avatar" style="background: #1e3a8a;">
+            <span class="material-symbols-outlined" style="font-size: 18px;">shield_person</span>
+          </div>
+        </div>
+
+        <!-- Logout Button -->
+        <button id="logoutBtn" class="btn btn-outline btn-sm" title="Log out of session">
+          <span class="material-symbols-outlined" style="font-size: 16px;">logout</span>
+          <span style="font-size: 0.8rem;">Logout</span>
+        </button>
       </div>
     </div>
   </header>
 
-  <main class="container" style="padding-top: 1.5rem; padding-bottom: 3rem;">
+  <main class="container" style="max-width: 1280px; margin: 0 auto; padding: 1.5rem 1.5rem 3rem 1.5rem; flex: 1;">
     <!-- Dashboard Header -->
-    <div class="dashboard-header">
-      <div>
-        <h1 class="dashboard-title">University Executive Command Center</h1>
-        <p class="dashboard-subtitle">
-          Institutional health index, department resolution benchmarking, SLA compliance, and statutory audit exports.
+    <div class="stitch-welcome-row" style="margin-bottom: 1.5rem;">
+      <div class="stitch-welcome-content">
+        <div class="stitch-welcome-badges">
+          <span class="term-badge" style="background: #dbeafe; color: #1e40af;">CENTRAL GOVERNANCE CELL</span>
+          <span class="live-badge">
+            <span class="live-dot"></span>
+            <span>Real-Time SLA Engine Active</span>
+          </span>
+        </div>
+        <h1 class="stitch-welcome-title">University Executive Command Center</h1>
+        <p class="stitch-welcome-desc">
+          Institutional health index, department resolution benchmarking, statutory SLA compliance tracking, and one-click NAAC/UGC audit exports.
         </p>
       </div>
       <div>
-        <button class="btn btn-primary" onclick="openAuditModal()">
-          📄 Export NAAC / UGC Audit Report
+        <button class="stitch-btn-primary" onclick="openAuditModal()" id="exportAuditBtn" type="button">
+          <span class="material-symbols-outlined" style="font-size: 20px;">description</span>
+          <span>Export NAAC / UGC Audit Report</span>
         </button>
       </div>
     </div>
 
-    <!-- Executive KPI Grid -->
-    <div class="kpi-grid">
-      <div class="kpi-card">
-        <span class="kpi-label">Total Campus Issues</span>
-        <span class="kpi-value" id="kpiTotal">0</span>
+    <!-- Executive KPI Grid (6 Metrics) -->
+    <div class="admin-kpi-grid">
+      <!-- 1. Total Issues -->
+      <div class="stitch-kpi-card">
+        <div class="kpi-card-top">
+          <div>
+            <span class="kpi-card-label">Total Grievances</span>
+            <div class="kpi-card-number" id="kpiTotal">0</div>
+          </div>
+          <div class="kpi-card-icon navy">
+            <span class="material-symbols-outlined">receipt_long</span>
+          </div>
+        </div>
+        <div class="kpi-card-bottom">
+          <span>Registered Lifetime</span>
+          <span class="kpi-status-tag active">Campus Wide</span>
+        </div>
       </div>
-      <div class="kpi-card">
-        <span class="kpi-label">Resolved Complaints</span>
-        <span class="kpi-value" id="kpiResolved" style="color: #16a34a;">0</span>
+
+      <!-- 2. Resolved Complaints -->
+      <div class="stitch-kpi-card">
+        <div class="kpi-card-top">
+          <div>
+            <span class="kpi-card-label">Resolved & Closed</span>
+            <div class="kpi-card-number green" id="kpiResolved">0</div>
+          </div>
+          <div class="kpi-card-icon green">
+            <span class="material-symbols-outlined">check_circle</span>
+          </div>
+        </div>
+        <div class="kpi-card-bottom">
+          <span>Signed Off</span>
+          <span class="kpi-status-tag success">Verified</span>
+        </div>
       </div>
-      <div class="kpi-card">
-        <span class="kpi-label">Active Bottlenecks</span>
-        <span class="kpi-value" id="kpiOpen" style="color: #dc2626;">0</span>
+
+      <!-- 3. Active Open Bottlenecks -->
+      <div class="stitch-kpi-card">
+        <div class="kpi-card-top">
+          <div>
+            <span class="kpi-card-label">Active Bottlenecks</span>
+            <div class="kpi-card-number" id="kpiOpen" style="color: #ea580c;">0</div>
+          </div>
+          <div class="kpi-card-icon" style="background: #ffedd5; color: #c2410c;">
+            <span class="material-symbols-outlined">hourglass_top</span>
+          </div>
+        </div>
+        <div class="kpi-card-bottom">
+          <span>In Progress / Awaiting</span>
+          <span class="kpi-status-tag" style="background: #fed7aa; color: #9a3412;">Open Queue</span>
+        </div>
       </div>
-      <div class="kpi-card">
-        <span class="kpi-label">Resolution Rate</span>
-        <span class="kpi-value" id="kpiRate" style="color: #2563eb;">0%</span>
+
+      <!-- 4. Resolution Rate -->
+      <div class="stitch-kpi-card">
+        <div class="kpi-card-top">
+          <div>
+            <span class="kpi-card-label">Redressal Rate</span>
+            <div class="kpi-card-number blue" id="kpiRate">0%</div>
+          </div>
+          <div class="kpi-card-icon blue">
+            <span class="material-symbols-outlined">trending_up</span>
+          </div>
+        </div>
+        <div class="kpi-card-bottom">
+          <span>Efficiency Index</span>
+          <span class="kpi-status-tag active">Target &gt;90%</span>
+        </div>
       </div>
-      <div class="kpi-card">
-        <span class="kpi-label">SLA Breaches</span>
-        <span class="kpi-value" id="kpiSla" style="color: #b91c1c;">0</span>
+
+      <!-- 5. SLA Breaches -->
+      <div class="stitch-kpi-card">
+        <div class="kpi-card-top">
+          <div>
+            <span class="kpi-card-label">SLA Overdue</span>
+            <div class="kpi-card-number" id="kpiSla" style="color: #dc2626;">0</div>
+          </div>
+          <div class="kpi-card-icon" style="background: #fee2e2; color: #b91c1c;">
+            <span class="material-symbols-outlined">warning</span>
+          </div>
+        </div>
+        <div class="kpi-card-bottom">
+          <span>Overdue SLA Windows</span>
+          <span class="kpi-status-tag" style="background: #fecaca; color: #991b1b;">Action Needed</span>
+        </div>
       </div>
-      <div class="kpi-card">
-        <span class="kpi-label">Active Critical Interruptions</span>
-        <span class="kpi-value" id="kpiCritical" style="color: #ea580c;">0</span>
+
+      <!-- 6. Active Critical Interruptions -->
+      <div class="stitch-kpi-card">
+        <div class="kpi-card-top">
+          <div>
+            <span class="kpi-card-label">Lecture-Critical</span>
+            <div class="kpi-card-number" id="kpiCritical" style="color: #7c3aed;">0</div>
+          </div>
+          <div class="kpi-card-icon purple">
+            <span class="material-symbols-outlined">emergency</span>
+          </div>
+        </div>
+        <div class="kpi-card-bottom">
+          <span>15-Minute Response</span>
+          <span class="kpi-status-tag" style="background: #ede9fe; color: #6d28d9;">Urgent Dispatch</span>
+        </div>
       </div>
     </div>
 
-    <!-- Two Columns: League Table & Campus Broadcasts -->
-    <div style="display: grid; grid-template-columns: 2fr 1.2fr; gap: 1.5rem; margin-top: 1.5rem;">
+    <!-- Two-Column Grid: League Table & Campus Broadcasts -->
+    <div class="admin-layout-grid">
       <!-- Column 1: Department Benchmarking League Table -->
-      <div class="card">
-        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.25rem;">
-          🏆 Department Performance League Table
-        </h3>
-        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
-          Cross-faculty accountability comparing resolution speed and completion percentage.
-        </p>
+      <div class="stitch-kpi-card" style="padding: 1.5rem; justify-content: flex-start;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.5rem;">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary); margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+              <span class="material-symbols-outlined" style="color: #f59e0b;">emoji_events</span>
+              <span>Academic Department Resolution League</span>
+            </h3>
+            <p style="font-size: 0.85rem; color: var(--secondary); margin: 0.25rem 0 0 0;">
+              Cross-faculty accountability comparing repair speed and resolution completion rates.
+            </p>
+          </div>
+        </div>
 
-        <div style="overflow-x: auto;">
+        <!-- Search Bar for Departments -->
+        <div class="stitch-search-input-wrapper" style="margin: 0.75rem 0 1rem 0;">
+          <span class="material-symbols-outlined stitch-search-icon">search</span>
+          <input type="text" id="deptSearchInput" class="stitch-search-input" placeholder="Filter departments by name or faculty code (e.g. CSE, Mechanical)...">
+        </div>
+
+        <div style="overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-md);">
           <table class="league-table">
             <thead>
               <tr>
-                <th>Academic Faculty</th>
-                <th>Total</th>
-                <th>Resolved</th>
-                <th>Pending</th>
-                <th>Completion Rate</th>
+                <th>Academic Department</th>
+                <th style="text-align: center;">Total</th>
+                <th style="text-align: center;">Resolved</th>
+                <th style="text-align: center;">Open</th>
+                <th>Resolution Efficiency</th>
               </tr>
             </thead>
             <tbody id="deptLeagueTbody">
-              <!-- Populated via admin.js -->
+              <tr>
+                <td colspan="5" style="text-align: center; padding: 2rem; color: var(--secondary);">
+                  Loading department league data...
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
       </div>
 
       <!-- Column 2: Campus Outage & Broadcast Manager -->
-      <div class="card">
-        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.25rem;">
-          📢 Outage & Maintenance Broadcasts
-        </h3>
-        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
-          Announce planned power cuts, water maintenance, or server upgrades campus-wide.
-        </p>
+      <div class="stitch-kpi-card" style="padding: 1.5rem; justify-content: flex-start;">
+        <div style="margin-bottom: 1rem;">
+          <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--primary); margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+            <span class="material-symbols-outlined" style="color: var(--accent-blue);">campaign</span>
+            <span>Outage & Maintenance Bulletins</span>
+          </h3>
+          <p style="font-size: 0.85rem; color: var(--secondary); margin: 0.25rem 0 0 0;">
+            Publish campus-wide alerts for planned outages, electrical servicing, or emergency repairs.
+          </p>
+        </div>
 
-        <form id="createBroadcastForm" style="margin-bottom: 1.5rem;">
-          <div class="form-group">
-            <label class="form-label">Notice Headline</label>
-            <input type="text" id="bcTitle" class="form-control" placeholder="e.g. Server Maintenance tonight" required>
+        <!-- Create Broadcast Form -->
+        <form id="createBroadcastForm" style="background: var(--surface-low); padding: 1.1rem; border-radius: var(--radius-md); border: 1px solid var(--border); margin-bottom: 1.25rem;">
+          <div class="form-group" style="margin-bottom: 0.75rem;">
+            <label class="form-label" for="bcTitle" style="font-size: 0.8rem; font-weight: 700;">Bulletin Headline</label>
+            <input type="text" id="bcTitle" class="form-control" placeholder="e.g. Scheduled power cut in Block B tomorrow" required style="font-size: 0.88rem;">
           </div>
-          <div class="form-group">
-            <label class="form-label">Announcement Details</label>
-            <textarea id="bcMessage" class="form-control" rows="2" placeholder="Time and impacted campus block..." required></textarea>
+          <div class="form-group" style="margin-bottom: 0.85rem;">
+            <label class="form-label" for="bcMessage" style="font-size: 0.8rem; font-weight: 700;">Announcement Details</label>
+            <textarea id="bcMessage" class="form-control" rows="2" placeholder="Specify affected blocks, timings, and backup facilities..." required style="font-size: 0.88rem;"></textarea>
           </div>
-          <button type="submit" class="btn btn-sm btn-primary" style="width: 100%;">Publish Campus Broadcast</button>
+          <button type="submit" id="submitBroadcastBtn" class="stitch-btn-primary" style="width: 100%; justify-content: center; padding: 0.65rem 1rem; font-size: 0.88rem;">
+            <span class="material-symbols-outlined" style="font-size: 18px;">send</span>
+            <span>Publish Campus Bulletin</span>
+          </button>
         </form>
 
-        <h4 style="font-size: 0.9rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-main);">Active Campus Notices:</h4>
-        <div id="broadcastListContainer">
-          <!-- Populated via admin.js -->
+        <!-- Active Bulletins List -->
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+          <h4 style="font-size: 0.88rem; font-weight: 700; color: var(--text-main); margin: 0;">Active Campus Notices</h4>
+          <span style="font-size: 0.72rem; color: var(--secondary); font-weight: 600;">Visible to All Portals</span>
+        </div>
+        <div id="broadcastListContainer" style="max-height: 280px; overflow-y: auto; padding-right: 0.25rem;">
+          <div style="color: var(--secondary); font-size: 0.85rem; text-align: center; padding: 1rem;">Loading bulletins...</div>
         </div>
       </div>
     </div>
   </main>
 
-  <!-- Statutory Audit Modal -->
-  <div id="auditModal" class="modal-overlay">
-    <div class="modal-box" style="border-top: 6px solid #1e3a8a;">
+  <!-- Statutory Audit Modal (Stitch Modern Modal) -->
+  <div id="auditModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="auditModalTitle">
+    <div class="modal-box" style="border-top: 6px solid #1e3a8a; max-width: 640px;">
       <div class="modal-header">
-        <h3 class="modal-title" style="color: #1e3a8a;">📄 Statutory Grievance Redressal Audit Report</h3>
-        <button class="close-btn" onclick="closeAuditModal()">&times;</button>
+        <h3 class="modal-title" id="auditModalTitle" style="color: #1e3a8a; display: flex; align-items: center; gap: 0.5rem;">
+          <span class="material-symbols-outlined" style="font-size: 22px;">verified</span>
+          <span>Statutory Grievance Redressal Audit Report</span>
+        </h3>
+        <button class="close-btn" onclick="closeAuditModal()" type="button" aria-label="Close modal">&times;</button>
       </div>
 
-      <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.25rem; font-size: 0.9rem;">
-        <div style="margin-bottom: 0.6rem;">🏛️ <strong>Institution:</strong> <span id="auditInstitution"></span></div>
-        <div style="margin-bottom: 0.6rem;">📅 <strong>Generated On:</strong> <span id="auditGenerated"></span></div>
-        <hr style="border: none; border-top: 1px solid var(--border); margin: 0.75rem 0;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
-          <div>📥 <strong>Total Grievances:</strong> <span id="auditReceived"></span></div>
-          <div>✅ <strong>Total Resolved:</strong> <span id="auditResolved"></span></div>
-          <div>📊 <strong>Redressal Rate:</strong> <span id="auditRate" style="color: #16a34a; font-weight: 700;"></span></div>
-          <div>🚨 <strong>Lecture Interventions:</strong> <span id="auditInterventions"></span></div>
+      <div style="background: var(--surface-low); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.25rem; font-size: 0.88rem; margin: 1rem 0;">
+        <div style="margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span class="material-symbols-outlined" style="font-size: 18px; color: var(--secondary);">account_balance</span>
+          <strong>Institution:</strong> <span id="auditInstitution"></span>
         </div>
-        <div style="background: #dcfce7; color: #166534; padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.82rem;">
-          🛡️ Compliance Status: <span id="auditCompliance"></span>
+        <div style="margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span class="material-symbols-outlined" style="font-size: 18px; color: var(--secondary);">calendar_today</span>
+          <strong>Generated On:</strong> <span id="auditGenerated"></span>
+        </div>
+        <hr style="border: none; border-top: 1px solid var(--border); margin: 0.75rem 0;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div style="background: #ffffff; padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+            <div style="font-size: 0.72rem; color: var(--secondary); text-transform: uppercase; font-weight: 700;">Total Grievances</div>
+            <div id="auditReceived" style="font-size: 1.5rem; font-weight: 800; color: var(--primary);">0</div>
+          </div>
+          <div style="background: #ffffff; padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+            <div style="font-size: 0.72rem; color: var(--secondary); text-transform: uppercase; font-weight: 700;">Resolved Complaints</div>
+            <div id="auditResolved" style="font-size: 1.5rem; font-weight: 800; color: var(--success);">0</div>
+          </div>
+          <div style="background: #ffffff; padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+            <div style="font-size: 0.72rem; color: var(--secondary); text-transform: uppercase; font-weight: 700;">Resolution Percentage</div>
+            <div id="auditRate" style="font-size: 1.5rem; font-weight: 800; color: var(--accent-blue);">0%</div>
+          </div>
+          <div style="background: #ffffff; padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+            <div style="font-size: 0.72rem; color: var(--secondary); text-transform: uppercase; font-weight: 700;">Lecture Interventions</div>
+            <div id="auditInterventions" style="font-size: 1.5rem; font-weight: 800; color: #7c3aed;">0</div>
+          </div>
+        </div>
+        <div style="background: #dcfce7; color: #166534; padding: 0.65rem 0.85rem; border-radius: var(--radius-sm); font-weight: 700; font-size: 0.82rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span class="material-symbols-outlined" style="font-size: 18px;">security</span>
+          <span>Compliance Status: <span id="auditCompliance"></span></span>
         </div>
       </div>
 
       <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.25rem;">
-        <button class="btn btn-outline" onclick="closeAuditModal()">Close Preview</button>
-        <button class="btn btn-primary" onclick="window.print()">🖨️ Print / Save as PDF</button>
+        <button class="btn btn-outline" onclick="closeAuditModal()" type="button">Close Preview</button>
+        <button class="btn btn-primary" onclick="window.print()" type="button" style="display: flex; align-items: center; gap: 0.4rem;">
+          <span class="material-symbols-outlined" style="font-size: 18px;">print</span>
+          <span>Print / Save as PDF</span>
+        </button>
       </div>
     </div>
   </div>
 
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="stitch-toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Scripts -->
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/admin.js"></script>

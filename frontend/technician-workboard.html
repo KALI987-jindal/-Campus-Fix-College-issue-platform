@@ -4,83 +4,339 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Maintenance & Ground Staff Workboard — CampusFix</title>
+  <script>
+    (function () {
+      try {
+        var token = localStorage.getItem("campus_fix_token");
+        var userStr = localStorage.getItem("campus_fix_user");
+        var user = userStr ? JSON.parse(userStr) : null;
+        var allowedRoles = ["TECHNICIAN", "SUPERVISOR", "ADMIN"];
+        if (!token || !user) {
+          window.location.replace("index.html");
+          return;
+        }
+        var role = (user.role || "").toUpperCase();
+        if (!allowedRoles.includes(role)) {
+          if (role === "STUDENT") {
+            window.location.replace("student-dashboard.html");
+          } else if (role === "TEACHER" || role === "HOD") {
+            window.location.replace("teacher-dashboard.html");
+          } else {
+            window.location.replace("index.html");
+          }
+        }
+      } catch (e) {
+        window.location.replace("index.html");
+      }
+    })();
+  </script>
+  <!-- Google Fonts: Plus Jakarta Sans & Material Symbols Outlined -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/dashboard.css">
+  <style>
+    .tech-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 900px) {
+      .tech-kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 480px) {
+      .tech-kpi-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .tech-card-modern {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.4rem;
+      margin-bottom: 1.15rem;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .tech-card-modern:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+      border-color: #cbd5e1;
+    }
+    .tech-card-critical {
+      border-left: 5px solid #dc2626 !important;
+      background: linear-gradient(180deg, rgba(254, 242, 242, 0.4) 0%, #ffffff 40%);
+    }
+    .tech-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      background: var(--surface-low);
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      margin: 0.85rem 0;
+      border: 1px solid var(--border);
+    }
+    @media (max-width: 720px) {
+      .tech-meta-grid {
+        grid-template-columns: 1fr;
+        gap: 0.4rem;
+      }
+    }
+  </style>
 </head>
-<body>
+<body style="background: var(--bg-main); min-height: 100vh; display: flex; flex-direction: column;">
 
-  <!-- Top Navigation -->
-  <header class="navbar">
-    <div class="container nav-wrapper">
-      <a href="technician-workboard.html" class="brand-logo">
-        <span>🏫 CampusFix</span>
-        <span class="brand-badge" style="background: #fef3c7; color: #b45309;">Ground Operations</span>
+  <!-- Sticky Top Navigation (Stitch Civic Collegiate Style) -->
+  <header class="stitch-navbar">
+    <div class="stitch-nav-inner">
+      <!-- Brand Logo -->
+      <a href="technician-workboard.html" class="stitch-nav-brand">
+        <div class="stitch-brand-icon" style="background: #b45309;">
+          <span class="material-symbols-outlined" style="font-size: 22px;">handyman</span>
+        </div>
+        <div class="stitch-brand-text">
+          <span class="stitch-brand-title">CampusFix</span>
+          <span class="stitch-brand-subtitle" style="color: #b45309;">Ground Operations</span>
+        </div>
       </a>
 
-      <div class="nav-user">
-        <div class="user-badge">
-          <span id="navUserName">Staff Name</span>
-          <span class="user-role-tag" id="navUserRole" style="background: #0284c7;">STAFF</span>
+      <!-- Navigation Tabs (Stitch Style) -->
+      <nav class="stitch-nav-links" id="techNavTabs">
+        <button class="stitch-nav-link active" id="tabAllTasks" type="button">
+          <span class="material-symbols-outlined" style="font-size: 18px;">assignment</span>
+          <span>Task Queue</span>
+        </button>
+        <button class="stitch-nav-link" id="tabCriticalTasks" type="button">
+          <span class="material-symbols-outlined" style="font-size: 18px; color: #dc2626;">emergency</span>
+          <span>Lecture-Critical</span>
+        </button>
+        <button class="stitch-nav-link" id="tabMyTasks" type="button">
+          <span class="material-symbols-outlined" style="font-size: 18px;">person_pin</span>
+          <span>My Assigned</span>
+        </button>
+      </nav>
+
+      <!-- Right Utility Actions -->
+      <div class="stitch-nav-actions">
+        <!-- Live Dot Pill -->
+        <div class="live-badge" style="background: #fef3c7; color: #92400e; padding: 0.35rem 0.75rem; border-radius: var(--radius-full); border: 1px solid #fde68a;">
+          <span class="live-dot" style="background: #f59e0b; box-shadow: 0 0 6px #f59e0b;"></span>
+          <span style="font-size: 0.75rem; font-weight: 700;">FIELD DISPATCH ACTIVE</span>
         </div>
-        <button id="logoutBtn" class="btn btn-outline btn-sm">Logout</button>
+
+        <div style="height: 24px; width: 1px; background: var(--border);"></div>
+
+        <!-- Staff Profile Pill -->
+        <div class="stitch-nav-user">
+          <div class="stitch-user-info">
+            <span class="stitch-user-name" id="navUserName">Staff Name</span>
+            <span class="stitch-user-dept" id="navUserDept">Ground Operations</span>
+            <span id="navUserRole" class="badge" style="display: none;">STAFF</span>
+          </div>
+          <div class="stitch-user-avatar" style="background: #0284c7;">
+            <span class="material-symbols-outlined" style="font-size: 18px;">construction</span>
+          </div>
+        </div>
+
+        <!-- Logout Button -->
+        <button id="logoutBtn" class="btn btn-outline btn-sm" title="Log out of session">
+          <span class="material-symbols-outlined" style="font-size: 16px;">logout</span>
+          <span style="font-size: 0.8rem;">Logout</span>
+        </button>
       </div>
     </div>
   </header>
 
-  <main class="container" style="padding-top: 1.5rem; padding-bottom: 3rem;">
+  <main class="container" style="max-width: 1080px; margin: 0 auto; padding: 1.5rem 1.5rem 3rem 1.5rem; flex: 1;">
     <!-- Active Role Notice -->
-    <div id="techRoleNotice" class="badge badge-assigned" style="display: none; padding: 0.6rem 1rem; width: 100%; margin-bottom: 1rem; font-size: 0.88rem;"></div>
+    <div id="techRoleNotice" style="display: none; background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; border-radius: var(--radius-md); padding: 0.75rem 1.25rem; margin-bottom: 1.25rem; font-size: 0.9rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+      <span class="material-symbols-outlined" style="color: var(--accent-blue);">badge</span>
+      <span id="techRoleNoticeText">Active Ground Staff</span>
+    </div>
 
-    <!-- Header -->
-    <div class="dashboard-header">
-      <div>
-        <h1 class="dashboard-title">Supervisor & Field Worker Queue</h1>
-        <p class="dashboard-subtitle">
-          Hybrid Operations: Supervisors dispatch daily wage staff, while smartphone-enabled technicians execute 1-click photo proof updates.
+    <!-- Header Section -->
+    <div class="stitch-welcome-row" style="margin-bottom: 1.5rem;">
+      <div class="stitch-welcome-content">
+        <div class="stitch-welcome-badges">
+          <span class="term-badge" style="background: #fef3c7; color: #92400e;">CAMPUS REPAIR &amp; MAINTENANCE</span>
+          <span class="live-badge">
+            <span class="live-dot" style="background: #10b981; box-shadow: 0 0 6px #10b981;"></span>
+            <span>Mobile Photo Proof Engine</span>
+          </span>
+        </div>
+        <h1 class="stitch-welcome-title">Supervisor &amp; Field Worker Queue</h1>
+        <p class="stitch-welcome-desc">
+          Hybrid ground operations: Supervisors dispatch daily wage and specialized technicians, while smartphone-enabled staff execute 1-click mobile photo proof resolutions.
         </p>
       </div>
       <div>
-        <button class="btn btn-outline" onclick="loadStaffTasks()">🔄 Refresh Tasks</button>
+        <button class="btn btn-outline" id="refreshTasksBtn" onclick="loadStaffTasks()" type="button" style="display: flex; align-items: center; gap: 0.4rem; padding: 0.65rem 1.1rem; font-weight: 700;">
+          <span class="material-symbols-outlined" style="font-size: 18px;">refresh</span>
+          <span>Refresh Queue</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick KPI Summary Grid (4 Cards) -->
+    <div class="tech-kpi-grid">
+      <div class="stitch-kpi-card">
+        <div class="kpi-card-top">
+          <div>
+            <span class="kpi-card-label">Total in Queue</span>
+            <div class="kpi-card-number" id="kpiQueueTotal">0</div>
+          </div>
+          <div class="kpi-card-icon navy">
+            <span class="material-symbols-outlined">assignment</span>
+          </div>
+        </div>
+        <div class="kpi-card-bottom">
+          <span>Active Complaints</span>
+          <span class="kpi-status-tag active">Queue</span>
+        </div>
+      </div>
+
+      <div class="stitch-kpi-card">
+        <div class="kpi-card-top">
+          <div>
+            <span class="kpi-card-label">Lecture-Critical</span>
+            <div class="kpi-card-number" id="kpiQueueCritical" style="color: #dc2626;">0</div>
+          </div>
+          <div class="kpi-card-icon" style="background: #fee2e2; color: #b91c1c;">
+            <span class="material-symbols-outlined">emergency</span>
+          </div>
+        </div>
+        <div class="kpi-card-bottom">
+          <span>15-Minute SLA</span>
+          <span class="kpi-status-tag" style="background: #fecaca; color: #991b1b;">Immediate</span>
+        </div>
+      </div>
+
+      <div class="stitch-kpi-card">
+        <div class="kpi-card-top">
+          <div>
+            <span class="kpi-card-label">In Progress</span>
+            <div class="kpi-card-number blue" id="kpiQueueInProgress">0</div>
+          </div>
+          <div class="kpi-card-icon blue">
+            <span class="material-symbols-outlined">build_circle</span>
+          </div>
+        </div>
+        <div class="kpi-card-bottom">
+          <span>Technicians on Site</span>
+          <span class="kpi-status-tag active">Active Work</span>
+        </div>
+      </div>
+
+      <div class="stitch-kpi-card">
+        <div class="kpi-card-top">
+          <div>
+            <span class="kpi-card-label">Awaiting Dispatch</span>
+            <div class="kpi-card-number" id="kpiQueueSubmitted" style="color: #d97706;">0</div>
+          </div>
+          <div class="kpi-card-icon" style="background: #fef3c7; color: #b45309;">
+            <span class="material-symbols-outlined">pending_actions</span>
+          </div>
+        </div>
+        <div class="kpi-card-bottom">
+          <span>Unassigned Tickets</span>
+          <span class="kpi-status-tag" style="background: #fde68a; color: #78350f;">Needs Tech</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search & Filter Toolbar -->
+    <div class="stitch-search-toolbar" style="margin-bottom: 1.5rem;">
+      <div class="stitch-search-input-wrapper">
+        <span class="material-symbols-outlined stitch-search-icon">search</span>
+        <input type="text" id="taskSearchInput" class="stitch-search-input" placeholder="Search tasks by title, room, block, or trade...">
+      </div>
+      <div class="stitch-filter-group">
+        <select id="taskStatusFilter" class="stitch-filter-select" aria-label="Filter by task status">
+          <option value="ALL">All Statuses</option>
+          <option value="IN_PROGRESS">In Progress</option>
+          <option value="ASSIGNED">Assigned</option>
+          <option value="SUBMITTED">Submitted / Awaiting</option>
+        </select>
+        <select id="taskTradeFilter" class="stitch-filter-select" aria-label="Filter by trade specialty">
+          <option value="ALL">All Trades</option>
+          <option value="PLUMBING">Plumbing</option>
+          <option value="ELECTRICAL">Electrical</option>
+          <option value="CIVIL_CARPENTRY">Carpentry</option>
+          <option value="IT">IT / Systems</option>
+          <option value="SANITATION">Sanitation</option>
+        </select>
       </div>
     </div>
 
     <!-- Tasks List Container -->
-    <div id="tasksContainer" style="max-width: 800px; margin: 1rem auto 0 auto;">
-      <!-- Populated via staff.js -->
+    <div id="tasksContainer" style="max-width: 100%; margin: 0 auto;">
+      <div style="text-align: center; padding: 3rem; color: var(--secondary);">
+        <span class="material-symbols-outlined" style="font-size: 32px; animation: spin 1.5s linear infinite; margin-bottom: 0.5rem;">sync</span>
+        <div>Loading maintenance assignments...</div>
+      </div>
     </div>
   </main>
 
-  <!-- Proof Photo Upload Modal -->
-  <div id="proofModal" class="modal-overlay">
-    <div class="modal-box" style="border-top: 6px solid #16a34a;">
+  <!-- Proof Photo Upload Modal (Preserves All Batch 5C Contracts & Elements) -->
+  <div id="proofModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="proofModalTitle">
+    <div class="modal-box" style="border-top: 6px solid #16a34a; max-width: 580px;">
       <div class="modal-header">
-        <h3 class="modal-title" style="color: #15803d;">📸 Upload Fix Photo Proof</h3>
-        <button class="close-btn" onclick="closeProofModal()">&times;</button>
+        <h3 class="modal-title" id="proofModalTitle" style="color: #15803d; display: flex; align-items: center; gap: 0.5rem;">
+          <span class="material-symbols-outlined" style="font-size: 22px;">photo_camera</span>
+          <span>Upload Fix Photo Proof</span>
+        </h3>
+        <button class="close-btn" onclick="closeProofModal()" type="button" aria-label="Close modal">&times;</button>
       </div>
 
-      <p style="font-size: 0.85rem; color: #475569; margin-bottom: 1rem;">
-        To ensure transparency and prevent premature closing, submit proof showing the repaired equipment/fixture.
+      <p style="font-size: 0.88rem; color: var(--secondary); margin-bottom: 1.25rem; line-height: 1.4;">
+        To ensure institutional transparency and prevent premature closing, submit photo proof demonstrating the completed repair.
       </p>
 
-      <div class="form-group">
-        <label class="form-label">Photo Proof URL / Snapshot</label>
-        <input type="text" id="proofPhotoUrl" class="form-control" placeholder="e.g. /uploads/fixed_pipe_photo.jpg" value="/uploads/repaired_equipment_proof.jpg" required>
-        <div class="form-hint">Tip: Camera photo or static image path.</div>
+      <div class="form-group" style="margin-bottom: 1rem;">
+        <label class="form-label" for="proofPhotoFile" style="font-weight: 700; font-size: 0.88rem;">Work Proof Photo (Camera / Gallery)</label>
+        <input type="file" id="proofPhotoFile" class="form-control" accept="image/jpeg,image/png,image/jpg,image/webp" capture="environment" required style="padding: 0.5rem;">
+        <input type="hidden" id="proofPhotoUrl" value="">
+        <div class="form-hint" style="font-size: 0.75rem; color: var(--secondary); margin-top: 0.35rem;">
+          Accepted formats: JPG, JPEG, PNG, WEBP (Max 10 MB). On smartphones, opens camera directly.
+        </div>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Resolution Summary Note</label>
-        <input type="text" id="proofNote" class="form-control" placeholder="e.g. Replaced burnt fuse / tightened pipe coupling" required>
+      <!-- Live Photo Preview -->
+      <div id="proofPreviewContainer" style="display: none; margin-bottom: 1rem; text-align: center; background: var(--surface-low); padding: 0.75rem; border-radius: var(--radius-md); border: 1px solid var(--border);">
+        <img id="proofPreviewImg" src="" alt="Proof Preview" style="max-width: 100%; max-height: 200px; border-radius: var(--radius-md); border: 1px solid var(--border); object-fit: contain;">
+        <div id="proofFileInfo" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.35rem; font-weight: 600;"></div>
+      </div>
+
+      <!-- Feedback / Status / Error Banner -->
+      <div id="proofStatusMessage" style="display: none; padding: 0.65rem 0.9rem; border-radius: var(--radius-sm); margin-bottom: 1rem; font-size: 0.85rem; font-weight: 600;"></div>
+
+      <div class="form-group" style="margin-bottom: 1.25rem;">
+        <label class="form-label" for="proofNote" style="font-weight: 700; font-size: 0.88rem;">Resolution Summary Note</label>
+        <input type="text" id="proofNote" class="form-control" placeholder="e.g. Replaced burnt fuse / tightened pipe coupling" required style="font-size: 0.88rem;">
       </div>
 
       <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem;">
-        <button class="btn btn-outline" onclick="closeProofModal()">Cancel</button>
-        <button class="btn btn-success" onclick="submitProof()">Verify & Mark Resolved</button>
+        <button type="button" class="btn btn-outline" id="cancelProofBtn" onclick="closeProofModal()">Cancel</button>
+        <button type="button" class="btn btn-success" id="submitProofBtn" onclick="submitProof()" style="display: flex; align-items: center; gap: 0.4rem; font-weight: 700;">
+          <span class="material-symbols-outlined" style="font-size: 18px;">verified</span>
+          <span>Verify &amp; Mark Resolved</span>
+        </button>
       </div>
     </div>
   </div>
 
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="stitch-toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Scripts -->
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/staff.js"></script>

@@ -146,3 +146,9 @@ def supervisor_user(db, department):
 def technician_user(db, department):
     return _make_user(db, full_name="Tech Plumber", email="tech@campus.edu",
                       role="TECHNICIAN", dept_id=department.id, trade="PLUMBING")
+
+
+@pytest.fixture()
+def hod_user(db, department):
+    return _make_user(db, full_name="HOD CSE", email="hod_cse@campus.edu",
+                      role="HOD", dept_id=department.id)

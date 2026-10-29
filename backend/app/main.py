@@ -43,22 +43,64 @@ app.include_router(staff.router)
 app.include_router(admin.router)
 app.include_router(suggestions.router)
 
+MAX_UPLOAD_SIZE = 10 * 1024 * 1024  # 10 MB maximum upload limit
+ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
+
+def validate_image_signature(content: bytes, ext: str) -> bool:
+    """Validate file content begins with an authentic image signature (magic bytes)."""
+    if len(content) < 12:
+        return False
+    if ext in [".jpg", ".jpeg"]:
+        return content.startswith(b"\xff\xd8\xff")
+    if ext == ".png":
+        return content.startswith(b"\x89PNG\r\n\x1a\n")
+    if ext == ".webp":
+        return content.startswith(b"RIFF") and content[8:12] == b"WEBP"
+    return False
+
 @app.post("/api/v1/uploads", tags=["File Uploads"])
 async def upload_file(
     file: UploadFile = File(...),
     current_user = Depends(get_current_user)
 ):
-    """Upload photos (complaint attachments or resolution proof)."""
-    # Sanitize and create unique filename
-    ext = Path(file.filename).suffix.lower()
-    if ext not in [".jpg", ".jpeg", ".png", ".webp"]:
-        raise HTTPException(status_code=400, detail="Only image files (.jpg, .jpeg, .png, .webp) allowed")
+    """Upload photos (complaint attachments or resolution proof) with strict size & signature validation."""
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="Filename missing in upload request")
 
+    ext = Path(file.filename).suffix.lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid file type '{ext}'. Only image files (.jpg, .jpeg, .png, .webp) allowed."
+        )
+
+    # Enforce strict 10 MB maximum upload size without unbounded memory consumption
+    contents = await file.read(MAX_UPLOAD_SIZE + 1)
+    if len(contents) > MAX_UPLOAD_SIZE:
+        raise HTTPException(
+            status_code=413,
+            detail="File size exceeds the maximum allowed limit of 10 MB"
+        )
+    if len(contents) == 0:
+        raise HTTPException(status_code=400, detail="Uploaded file is empty")
+
+    # Validate actual file magic bytes signature; do not trust filename extension alone
+    if not validate_image_signature(contents, ext):
+        raise HTTPException(
+            status_code=400,
+            detail="File content does not match a valid image signature (.jpg, .jpeg, .png, .webp)"
+        )
+
+    # Safe random server-side filename prevents path traversal and script execution
     unique_filename = f"{uuid.uuid4().hex}{ext}"
-    target_path = UPLOAD_DIR / unique_filename
+    target_path = (UPLOAD_DIR / unique_filename).resolve()
+
+    # Defense-in-depth: Ensure target path remains strictly within UPLOAD_DIR
+    if not str(target_path).startswith(str(UPLOAD_DIR.resolve())):
+        raise HTTPException(status_code=400, detail="Invalid destination path")
 
     with open(target_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+        buffer.write(contents)
 
     file_url = f"/uploads/{unique_filename}"
     return {"filename": unique_filename, "url": file_url}
