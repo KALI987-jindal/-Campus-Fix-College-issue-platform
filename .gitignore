@@ -19,3 +19,29 @@ Thumbs.db
 backend/_test_results.txt
 backend/test_output.txt
 .pytest_cache/
+
+# Local evaluation screenshots (exact files only)
+01_login_page_with_6_roles.png
+02_student_dashboard.png
+03_teacher_dashboard.png
+04_hod_dashboard.png
+05_supervisor_workboard.png
+06_technician_workboard.png
+07_admin_dashboard.png
+final_admin.png
+final_hod.png
+final_login.png
+final_student.png
+final_supervisor.png
+final_teacher.png
+final_technician.png
+final_technician_proof_modal.png
+login_preview.png
+
+# Local evaluation credentials
+DEMO_CREDENTIALS.md
+
+# Local demo scripts (exact files only)
+backend/scripts/run_demo_server.py
+backend/scripts/seed_demo_data.py
+
