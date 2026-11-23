@@ -9,6 +9,8 @@ node_modules/
 dist/
 build/
 *.db
+*.db-shm
+*.db-wal
 *.sqlite
 *.sqlite3
 uploads/
@@ -44,4 +46,5 @@ DEMO_CREDENTIALS.md
 # Local demo scripts (exact files only)
 backend/scripts/run_demo_server.py
 backend/scripts/seed_demo_data.py
+backend/tests/test_demo_environment.py
 
