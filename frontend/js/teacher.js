@@ -81,31 +81,90 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 /**
- * Configure teacher-specific greeting & department subtitles
+ * Configure teacher and HOD identity, subtitles, and executive console styling
  */
 function setupTeacherIdentity() {
   const user = ApiClient.getUser();
   if (!user) return;
 
-  const fullName = user.full_name || "Faculty Member";
+  const isHOD = user.role === "HOD";
+  const fullName = user.full_name || (isHOD ? "Department HOD" : "Faculty Member");
+  const cleanName = fullName.replace(/\s*\((Demo\s+)?(HOD|Teacher|Faculty)\)/i, "").trim();
   const deptName = user.academic_department_name;
 
   const welcomeEl = document.getElementById("welcomeTeacherName");
-  if (welcomeEl) welcomeEl.textContent = fullName;
+  if (welcomeEl) welcomeEl.textContent = cleanName;
 
   const deptSubEl = document.getElementById("facultyDeptSubtitle");
   if (deptSubEl) {
-    if (deptName) {
+    if (isHOD) {
+      deptSubEl.textContent = `${deptName || "Academic Department"} | HOD Management Console`;
+    } else if (deptName) {
       deptSubEl.textContent = `${deptName} | Faculty Portal`;
     } else {
-      deptSubEl.textContent = `General Faculty (Unassigned Department) | Faculty Portal`;
+      deptSubEl.textContent = `General Faculty | Faculty Portal`;
+    }
+  }
+
+  // Set explicit role tag
+  const roleEl = document.getElementById("navUserRole");
+  if (roleEl) roleEl.textContent = user.role;
+
+  const userDeptEl = document.getElementById("navUserDept");
+  if (userDeptEl) {
+    userDeptEl.textContent = isHOD ? `${deptName || "Department"} (HOD)` : (deptName || "Faculty Portal");
+  }
+
+  // Distinct HOD Console UI Enhancements
+  if (isHOD) {
+    document.title = "Department HOD Console — CampusFix";
+
+    const brandSub = document.querySelector(".stitch-brand-subtitle");
+    if (brandSub) {
+      brandSub.textContent = "HOD Console";
+      brandSub.style.background = "#f5f3ff";
+      brandSub.style.color = "#7c3aed";
+      brandSub.style.borderColor = "#ddd6fe";
+    }
+
+    const termBadge = document.querySelector(".term-badge");
+    if (termBadge) {
+      termBadge.textContent = "Department Executive Console";
+      termBadge.style.background = "#f5f3ff";
+      termBadge.style.color = "#7c3aed";
+      termBadge.style.borderColor = "#ddd6fe";
+    }
+
+    const welcomeDesc = document.querySelector(".stitch-welcome-desc");
+    if (welcomeDesc) {
+      welcomeDesc.innerHTML = `Department governance: supervise faculty facilities, expedite lecture emergencies, and monitor resolution SLAs. <span class="stitch-dept-highlight" id="facultyDeptSubtitle">${escapeHtml(deptName || "Department")}</span>`;
+    }
+
+    const queueTitle = document.getElementById("teacherQueueTitle");
+    if (queueTitle) {
+      queueTitle.textContent = "Department Infrastructure & Faculty Grievance Queue";
+    }
+
+    const queueDesc = document.getElementById("teacherQueueDesc");
+    if (queueDesc) {
+      queueDesc.textContent = "Department-level supervision: classroom teaching hubs, research labs, and faculty work orders.";
+    }
+
+    // Navigation tab labels for HOD
+    const tabDash = document.getElementById("tabFacultyDashboard");
+    if (tabDash) {
+      tabDash.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px;">dashboard</span><span>Command Center</span>`;
+    }
+    const tabSignOff = document.getElementById("tabSignOffNav");
+    if (tabSignOff) {
+      tabSignOff.innerHTML = `<span class="material-symbols-outlined" style="font-size: 18px;">verified_user</span><span>Pending Approvals</span>`;
     }
   }
 
   const officeTextEl = document.getElementById("assignedOfficeText");
   if (officeTextEl) {
     if (deptName) {
-      officeTextEl.textContent = `${deptName} Faculty Lounge & Suites`;
+      officeTextEl.textContent = `${deptName} ${isHOD ? "HOD Executive Suite" : "Faculty Lounge & Suites"}`;
     } else {
       officeTextEl.textContent = `General Faculty Lounge & Suites`;
     }
@@ -167,6 +226,9 @@ async function loadAllDashboardData() {
 
     // Render Urgent Lecture Disruption Alert Banner
     renderLectureDisruptionBanner();
+
+    // Render Distinct HOD Executive Console (if role is HOD)
+    renderHODConsoleIfApplicable();
 
     // Render Faculty Issues Queue
     renderTeacherQueue();
@@ -259,6 +321,82 @@ function calculateAndRenderTeacherKPIs() {
     if (isAdmin) return true;
     return (userId && i.reported_by_user_id === userId) || (userDeptId && i.academic_department_id === userDeptId);
   });
+
+  const isHOD = user && user.role === "HOD";
+
+  // When HOD is active, calculate distinct Department Leadership Metrics
+  if (isHOD) {
+    const deptIssues = allLoadedIssues.filter(i => userDeptId && i.academic_department_id === userDeptId);
+    // Open in-field tickets (SUBMITTED, ASSIGNED, IN_PROGRESS) matching Admin Dashboard definition
+    const deptOpen = deptIssues.filter(i => i.status === "SUBMITTED" || i.status === "ASSIGNED" || i.status === "IN_PROGRESS");
+    // Active lifecycle tickets not yet closed (includes RESOLVED pending verification)
+    const deptActive = deptIssues.filter(i => i.status !== "CLOSED");
+    // Resolved and Closed issues (repaired by technician or officially signed off)
+    const deptResolved = deptIssues.filter(i => i.status === "RESOLVED" || i.status === "CLOSED").length;
+    const deptRate = deptIssues.length > 0 ? `${Math.round((deptResolved / deptIssues.length) * 1000) / 10}%` : "N/A";
+
+    const kpiMyReqEl = document.getElementById("kpiMyRequestsCount");
+    if (kpiMyReqEl) kpiMyReqEl.textContent = deptOpen.length;
+
+    const kpiMyReqCard = document.getElementById("kpiCardMyRequests");
+    if (kpiMyReqCard) {
+      const label = kpiMyReqCard.querySelector(".kpi-card-label");
+      if (label) label.textContent = "Department Open Tickets";
+      const badge = kpiMyReqCard.querySelector(".kpi-status-tag");
+      if (badge) badge.textContent = "Open Queue";
+      kpiMyReqCard.title = `${deptOpen.length} Open In-Field + ${pendingSignOff.length} Pending Sign-Off = ${deptActive.length} Active Lifecycle (${deptIssues.length} Total Grievances)`;
+    }
+    const kpiMyReqSub = document.getElementById("kpiMyRequestsSubtext");
+    if (kpiMyReqSub) {
+      kpiMyReqSub.textContent = deptIssues.length > 0 
+        ? `${deptIssues.length} Total Grievances (${deptActive.length} Active)`
+        : "No Grievances Recorded";
+    }
+
+    const kpiLcEl = document.getElementById("kpiLectureCriticalCount");
+    if (kpiLcEl) kpiLcEl.textContent = activeLc.length;
+    const kpiLcSub = document.getElementById("kpiLectureCriticalSubtext");
+    if (kpiLcSub) kpiLcSub.textContent = activeLc.length > 0 ? "🚨 In-Session Alert Active" : "No Active Emergencies";
+    const kpiLcBadge = document.getElementById("kpiLectureCriticalBadge");
+    if (kpiLcBadge) kpiLcBadge.textContent = activeLc.length > 0 ? "15m SLA Active" : "15m Target";
+
+    const kpiProgEl = document.getElementById("kpiInProgressCount");
+    if (kpiProgEl) kpiProgEl.textContent = pendingSignOff.length;
+    const kpiProgCard = document.getElementById("kpiCardInProgress");
+    if (kpiProgCard) {
+      const label = kpiProgCard.querySelector(".kpi-card-label");
+      if (label) label.textContent = "Pending Approvals";
+      const icon = kpiProgCard.querySelector(".kpi-card-icon");
+      if (icon) {
+        icon.className = "kpi-card-icon purple";
+        icon.innerHTML = `<span class="material-symbols-outlined" style="font-size: 24px;">verified_user</span>`;
+      }
+      const badge = kpiProgCard.querySelector(".kpi-status-tag");
+      if (badge) badge.textContent = "Sign-Off";
+    }
+    const kpiProgSub = document.getElementById("kpiInProgressSubtext");
+    if (kpiProgSub) kpiProgSub.textContent = pendingSignOff.length > 0 ? `${pendingSignOff.length} Repairs Need Verification` : "All Verified";
+
+    const kpiResEl = document.getElementById("kpiResolvedCount");
+    if (kpiResEl) kpiResEl.textContent = deptRate;
+    const kpiResCard = document.getElementById("kpiCardResolved");
+    if (kpiResCard) {
+      const label = kpiResCard.querySelector(".kpi-card-label");
+      if (label) label.textContent = "Department Resolution Rate";
+    }
+    const kpiResSub = document.getElementById("kpiResolvedSubtext");
+    if (kpiResSub) {
+      kpiResSub.textContent = deptIssues.length > 0
+        ? `${deptResolved} of ${deptIssues.length} Resolved/Closed`
+        : "No Grievances Recorded";
+    }
+
+    const badgeSignOff = document.getElementById("pendingSignOffBadge");
+    if (badgeSignOff) {
+      badgeSignOff.textContent = `${pendingSignOff.length} Pending Sign-Off`;
+    }
+    return;
+  }
 
   const kpiResEl = document.getElementById("kpiResolvedCount");
   if (kpiResEl) kpiResEl.textContent = resolvedAll.length;
@@ -374,6 +512,122 @@ function renderLectureDisruptionBanner() {
           <span class="material-symbols-outlined" style="font-size: 16px;">check_circle</span>
           <span>Mark Resolved</span>
         </button>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Render Distinct HOD Executive Department Governance Console
+ * Provides deep departmental analytics, SLA health, facility breakdown, and pending approvals
+ */
+function renderHODConsoleIfApplicable() {
+  const container = document.getElementById("hodDepartmentConsoleContainer");
+  if (!container) return;
+
+  const user = ApiClient.getUser();
+  const isHOD = user && user.role === "HOD";
+
+  if (!isHOD) {
+    container.style.display = "none";
+    container.innerHTML = "";
+    return;
+  }
+
+  const deptName = user.academic_department_name || "Academic Department";
+  const deptId = user.academic_department_id;
+  const deptIssues = allLoadedIssues.filter(i => deptId && i.academic_department_id === deptId);
+  const deptOpen = deptIssues.filter(i => i.status === "SUBMITTED" || i.status === "ASSIGNED" || i.status === "IN_PROGRESS");
+  const deptActive = deptIssues.filter(i => i.status !== "CLOSED");
+  const deptResolved = deptIssues.filter(i => i.status === "RESOLVED" || i.status === "CLOSED").length;
+  const deptRate = deptIssues.length > 0 ? `${Math.round((deptResolved / deptIssues.length) * 1000) / 10}%` : "N/A";
+  const pendingApprovals = allLoadedIssues.filter(i => i.status === "RESOLVED" && (i.reported_by_user_id === user.user_id || (deptId && i.academic_department_id === deptId)));
+  const activeLc = deptIssues.filter(i => i.priority === "LECTURE_CRITICAL" && i.status !== "CLOSED");
+
+  // Facility distribution
+  const classrooms = deptIssues.filter(i => i.scope === "DEPARTMENT_ONLY");
+  const facultyQuarters = deptIssues.filter(i => i.scope === "FACULTY_ROOM");
+
+  container.style.display = "block";
+  container.innerHTML = `
+    <div style="background: #ffffff; border: 1px solid #ddd6fe; border-radius: var(--radius-lg); padding: 1.6rem 1.75rem; box-shadow: var(--shadow-sm); border-top: 4px solid #7c3aed;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem; border-bottom: 1px solid var(--border); padding-bottom: 1.15rem; margin-bottom: 1.35rem;">
+        <div style="display: flex; align-items: center; gap: 0.85rem;">
+          <div style="width: 46px; height: 46px; border-radius: var(--radius-md); background: #f5f3ff; color: #7c3aed; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <span class="material-symbols-outlined" style="font-size: 26px;">analytics</span>
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+              <h2 style="font-size: 1.25rem; font-weight: 800; color: var(--navy-900, #0f172a); margin: 0; line-height: 1.25;">
+                ${escapeHtml(deptName)} • HOD Department Command &amp; Oversight
+              </h2>
+              <span class="stitch-badge" style="background: #f5f3ff; color: #7c3aed; font-weight: 700;">Executive Authority</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--secondary); margin: 0.35rem 0 0 0; line-height: 1.4;">
+              Real-time departmental governance, laboratory infrastructure health, faculty accountability, and pending repair sign-offs.
+            </p>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+          <button class="btn btn-sm btn-outline" onclick="openLectureCriticalModal()" style="border-color: #fca5a5; color: #b91c1c; font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.9rem;" type="button">
+            <span class="material-symbols-outlined" style="font-size: 16px;">emergency</span>
+            <span>Escalate Disruption</span>
+          </button>
+          <a href="#verificationSection" class="btn btn-sm btn-primary" style="background: #7c3aed; border-color: #6d28d9; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.9rem;">
+            <span class="material-symbols-outlined" style="font-size: 16px;">verified_user</span>
+            <span>Review Sign-Offs (${pendingApprovals.length})</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 3-Column Executive Insight Cards -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
+        <!-- Card 1: Department SLA & Resolution Rate -->
+        <div style="background: var(--surface-low, #f8fafc); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.2rem 1.3rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
+            <span style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--secondary); letter-spacing: 0.04em;">Resolution Efficiency</span>
+            <span style="font-size: 0.78rem; font-weight: 700; color: ${deptRate !== 'N/A' && parseFloat(deptRate) >= 70 ? 'var(--success)' : 'var(--accent-blue)'};">${deptRate}</span>
+          </div>
+          <div style="font-size: 1.5rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.35rem; line-height: 1.2;">
+            ${deptIssues.length > 0 ? `${deptResolved} / ${deptIssues.length} <span style="font-size: 0.85rem; font-weight: 600; color: var(--secondary);">Resolved</span>` : '<span style="font-size: 1.1rem; font-weight: 700; color: var(--secondary);">No Grievances</span>'}
+          </div>
+          <div style="width: 100%; height: 6px; background: #e2e8f0; border-radius: 9999px; overflow: hidden; margin-top: 0.65rem;">
+            <div style="width: ${deptRate !== 'N/A' ? deptRate : '0%'}; height: 100%; background: #7c3aed; border-radius: 9999px;"></div>
+          </div>
+          <span style="font-size: 0.75rem; color: var(--secondary); display: block; margin-top: 0.5rem; line-height: 1.35;">
+            ${deptIssues.length === 0 ? 'No recorded departmental tickets' : `${deptOpen.length} open tickets in field • ${pendingApprovals.length} awaiting verification (${deptActive.length} active lifecycle)`}
+          </span>
+        </div>
+
+        <!-- Card 2: Faculty & Lab Accountability -->
+        <div style="background: var(--surface-low, #f8fafc); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.2rem 1.3rem;">
+          <span style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--secondary); letter-spacing: 0.04em; display: block; margin-bottom: 0.65rem;">Faculty &amp; Facility Breakdown</span>
+          <div style="display: flex; flex-direction: column; gap: 0.45rem; font-size: 0.85rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: var(--secondary);">Classrooms &amp; Labs:</span>
+              <span style="font-weight: 700; color: var(--text-main);">${classrooms.length}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: var(--secondary);">Private Faculty Suites:</span>
+              <span style="font-weight: 700; color: var(--text-main);">${facultyQuarters.length}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: var(--secondary);">Disruption Emergencies:</span>
+              <span style="font-weight: 700; color: ${activeLc.length > 0 ? 'var(--danger)' : 'var(--success)'};">${activeLc.length}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: Pending Sign-Off Pipeline -->
+        <div style="background: var(--surface-low, #f8fafc); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.2rem 1.3rem;">
+          <span style="font-size: 0.78rem; font-weight: 700; text-transform: uppercase; color: var(--secondary); letter-spacing: 0.04em; display: block; margin-bottom: 0.65rem;">Sign-Off &amp; Audit Status</span>
+          <div style="font-size: 1.5rem; font-weight: 800; color: ${pendingApprovals.length > 0 ? '#b45309' : 'var(--success)'}; margin-bottom: 0.35rem; line-height: 1.2;">
+            ${pendingApprovals.length} <span style="font-size: 0.85rem; font-weight: 600; color: var(--secondary);">Awaiting Sign-Off</span>
+          </div>
+          <p style="font-size: 0.78rem; color: var(--secondary); margin: 0; line-height: 1.4;">
+            ${pendingApprovals.length > 0 ? 'Technicians have uploaded proof photos. Faculty or HOD verification is required to officially close.' : 'All completed departmental repairs are verified and closed.'}
+          </p>
+        </div>
       </div>
     </div>
   `;

@@ -164,15 +164,15 @@ function renderDeptLeagueTable(departments) {
             ${escapeHtml(d.code || "")}
           </span>
         </td>
-        <td style="text-align: center; font-weight: 600;">${d.total}</td>
-        <td style="text-align: center;"><span style="color: var(--success); font-weight: 700;">${d.resolved}</span></td>
-        <td style="text-align: center;"><span style="color: var(--danger); font-weight: 700;">${d.open}</span></td>
+        <td style="text-align: center; font-weight: 600; white-space: nowrap;">${d.total}</td>
+        <td style="text-align: center; white-space: nowrap;"><span style="color: var(--success); font-weight: 700;">${d.resolved}</span></td>
+        <td style="text-align: center; white-space: nowrap;"><span style="color: var(--danger); font-weight: 700;">${d.open}</span></td>
         <td>
           <div style="display: flex; align-items: center; gap: 0.65rem;">
             <div style="flex: 1; height: 8px; background: #e2e8f0; border-radius: 9999px; overflow: hidden;">
-              <div style="width: ${Math.min(d.rate_percent, 100)}%; height: 100%; background: ${d.rate_percent >= 80 ? 'var(--success)' : d.rate_percent >= 50 ? 'var(--accent-blue)' : 'var(--danger)'}; border-radius: 9999px;"></div>
+              <div style="width: ${d.total > 0 && d.rate_percent !== null && d.rate_percent !== undefined ? Math.min(d.rate_percent, 100) : 0}%; height: 100%; background: ${d.total === 0 || d.rate_percent === null ? '#cbd5e1' : d.rate_percent >= 80 ? 'var(--success)' : d.rate_percent >= 50 ? 'var(--accent-blue)' : 'var(--danger)'}; border-radius: 9999px;"></div>
             </div>
-            <span style="font-size: 0.82rem; font-weight: 800; min-width: 48px; text-align: right; color: var(--text-main);">${d.rate_percent}%</span>
+            <span style="font-size: 0.82rem; font-weight: 800; min-width: 48px; text-align: right; color: var(--text-main);">${d.total > 0 && d.rate_percent !== null && d.rate_percent !== undefined ? `${d.rate_percent}%` : "N/A"}</span>
           </div>
         </td>
       </tr>
@@ -196,7 +196,10 @@ async function loadExecutiveDashboard() {
     if (kpiTotal) kpiTotal.textContent = data.kpis.total_issues;
     if (kpiResolved) kpiResolved.textContent = data.kpis.resolved_issues;
     if (kpiOpen) kpiOpen.textContent = data.kpis.open_issues;
-    if (kpiRate) kpiRate.textContent = `${data.kpis.resolution_rate_percent}%`;
+    if (kpiRate) {
+      const hasRate = data.kpis.total_issues > 0 && data.kpis.resolution_rate_percent !== null && data.kpis.resolution_rate_percent !== undefined;
+      kpiRate.textContent = hasRate ? `${data.kpis.resolution_rate_percent}%` : "N/A";
+    }
     if (kpiSla) kpiSla.textContent = data.kpis.sla_breached;
     if (kpiCritical) kpiCritical.textContent = data.kpis.critical_active;
 
@@ -302,7 +305,8 @@ async function openAuditModal() {
     document.getElementById("auditGenerated").textContent = new Date(report.generated_at).toLocaleString();
     document.getElementById("auditReceived").textContent = report.total_grievances_received;
     document.getElementById("auditResolved").textContent = report.total_grievances_resolved;
-    document.getElementById("auditRate").textContent = `${report.resolution_percentage}%`;
+    const hasAuditRate = report.total_grievances_received > 0 && report.resolution_percentage !== null && report.resolution_percentage !== undefined;
+    document.getElementById("auditRate").textContent = hasAuditRate ? `${report.resolution_percentage}%` : "N/A";
     document.getElementById("auditInterventions").textContent = report.lecture_critical_interventions;
     document.getElementById("auditCompliance").textContent = report.statutory_compliance_status;
 

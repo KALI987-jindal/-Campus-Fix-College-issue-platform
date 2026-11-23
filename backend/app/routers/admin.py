@@ -29,7 +29,7 @@ def get_executive_dashboard(
         Issue.status.in_(["SUBMITTED", "ASSIGNED", "IN_PROGRESS"])
     ).count()
 
-    resolution_rate = round((resolved / total * 100), 1) if total > 0 else 100.0
+    resolution_rate = round((resolved / total * 100), 1) if total > 0 else None
 
     # Department breakdown
     depts = db.query(Department).all()
@@ -40,7 +40,7 @@ def get_executive_dashboard(
             Issue.academic_department_id == d.id,
             Issue.status.in_(["RESOLVED", "CLOSED"])
         ).count()
-        d_rate = round((d_resolved / d_total * 100), 1) if d_total > 0 else 100.0
+        d_rate = round((d_resolved / d_total * 100), 1) if d_total > 0 else None
         dept_league.append({
             "id": d.id,
             "name": d.name,
@@ -123,7 +123,7 @@ def export_audit_data(
         "generated_at": datetime.utcnow().isoformat(),
         "total_grievances_received": total,
         "total_grievances_resolved": resolved,
-        "resolution_percentage": round((resolved / total * 100), 1) if total > 0 else 100.0,
+        "resolution_percentage": round((resolved / total * 100), 1) if total > 0 else None,
         "anonymous_safety_reports": anonymous_grievances,
         "lecture_critical_interventions": lecture_critical_count,
         "statutory_compliance_status": "COMPLIANT WITH UGC REGULATION 2019"

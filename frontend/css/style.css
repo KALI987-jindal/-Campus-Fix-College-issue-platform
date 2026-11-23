@@ -1,85 +1,90 @@
 /* ========================================================
    CampusFix Design System — Core Styles & CSS Variables
-   Aligned with the Stitch "Civic Collegiate" design system.
+   University Operations Management SaaS Platform
    ======================================================== */
 
 /* ── Google Font: Plus Jakarta Sans ─────────────────────── */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
-  /* ── Brand colors (Stitch Civic Collegiate palette) ──── */
+  /* ── Brand colors (Premium Institutional Navy & Action Blue) ── */
 
-  /* Primary: deep institutional navy */
-  --primary:        #1b365d;   /* Stitch primary-container / DESIGN.md "Primary Navy" */
-  --primary-hover:  #0f2042;   /* DESIGN.md: "Hover shifts to #0F2042" */
-  --primary-light:  #d6e3ff;   /* Stitch primary-fixed — tinted surface for badges/bg */
-  --primary-dim:    #aec7f7;   /* Stitch primary-fixed-dim — lighter tint / inverse */
+  /* Primary: Deep institutional navy */
+  --primary:        #0f1d38;   /* Deep Institutional Navy */
+  --primary-hover:  #091224;   /* Darkened navy hover */
+  --primary-light:  #e0e7ff;   /* Soft slate/indigo tint for badges/surfaces */
+  --primary-dim:    #c7d2fe;   /* Muted indigo highlight */
+  --primary-navy:   #0f1d38;   /* Explicit institutional navy token */
 
-  /* Secondary / supporting text (Muted Slate — Stitch on-surface-variant) */
-  --secondary:       #44474e;  /* Stitch on-surface-variant for body subtext & descriptions */
-  --secondary-hover: #131b2e;  /* Hover state for muted text / on-surface */
-  --secondary-light: #f2f3ff;  /* Stitch surface-container-low */
+  /* Secondary / supporting text */
+  --secondary:       #475569;  /* Crisp slate for body subtext & descriptions */
+  --secondary-hover: #1e293b;  /* Dark slate hover state */
+  --secondary-light: #f1f5f9;  /* Surface container low */
 
-  /* Interactive action blue (Stitch secondary / action accent) */
-  --accent-blue:       #0058be;  /* Stitch secondary (Action Blue) */
-  --accent-blue-hover: #004395;  /* Stitch on-secondary-fixed-variant */
-  --accent-blue-light: #d8e2ff;  /* Stitch secondary-fixed */
+  /* Interactive action blue (Enterprise Blue) */
+  --accent-blue:       #2563eb;  /* High-contrast Action Blue */
+  --accent-blue-hover: #1d4ed8;  /* Deepened action blue */
+  --accent-blue-light: #eff6ff;  /* Ice blue surface tint */
 
-  /* Status — Stitch status hierarchy */
-  --success:        #065f46;   /* Resolved: on-tertiary-container (WCAG AA on white) */
-  --success-bg:     #ecfdf5;   /* Resolved background */
-  --success-light:  #f0fdf4;   /* Compat alias — resolved row bg (kept for existing JS) */
+  /* Status — High-Contrast Operational Hierarchy */
+  --success:        #047857;   /* Resolved: Emerald Green */
+  --success-bg:     #ecfdf5;   /* Resolved background tint */
+  --success-border: #a7f3d0;   /* Resolved border */
+  --success-light:  #ecfdf5;   /* Compat alias */
 
-  --warning:        #92400e;   /* In-Progress text */
-  --warning-bg:     #fffbeb;   /* In-Progress background */
+  --warning:        #b45309;   /* In-Progress text: Warm Amber */
+  --warning-bg:     #fffbeb;   /* In-Progress background tint */
+  --warning-border: #fde68a;   /* In-Progress border */
   --warning-light:  #fffbeb;   /* Compat alias */
 
-  --danger:         #ba1a1a;   /* Stitch error */
-  --danger-hover:   #93000a;   /* Stitch on-error-container */
-  --danger-light:   #ffdad6;   /* Stitch error-container */
+  --danger:         #dc2626;   /* Urgent / Critical: Crimson */
+  --danger-hover:   #b91c1c;   /* Dark red hover */
+  --danger-bg:      #fef2f2;   /* Critical background tint */
+  --danger-border:  #fecaca;   /* Critical border */
+  --danger-light:   #fef2f2;   /* Compat alias */
 
-  /* Faculty-room / purple accent (kept for existing components) */
-  --purple:         #6b21a8;
-  --purple-light:   #faf5ff;
+  /* Academic Leadership / Purple Accent */
+  --purple:         #7c3aed;   /* Academic Purple */
+  --purple-light:   #f5f3ff;   /* Soft violet tint */
+  --purple-border:  #ddd6fe;
 
   /* ── Surfaces & backgrounds ──────────────────────────── */
-  --bg-main:   #faf8ff;  /* Stitch background/surface — warm-white with violet tint */
-  --bg-card:   #ffffff;  /* Stitch surface-container-lowest — card white */
-  --bg-subtle: #f2f3ff;  /* Stitch surface-container-low — hover rows, sub-panels */
+  --bg-main:   #f8fafc;  /* Clean modern SaaS off-white slate */
+  --bg-card:   #ffffff;  /* Pure white surface */
+  --bg-subtle: #f1f5f9;  /* Slate 100 for hover rows, sub-panels */
+  --surface-low: #f8fafc;
+  --surface-hover: #f1f5f9;
 
   /* ── Borders ─────────────────────────────────────────── */
-  --border:        #e2e8f0;  /* Stitch Structural Lines (#E2E8F0) micro-border */
-  --border-subtle: #e2e7ff;  /* Stitch surface-container-high — dividers inside cards */
-  --border-focus:  #3b82f6;  /* Action & Focus Blue — unchanged per DESIGN.md spec */
+  --border:        #e2e8f0;  /* Clean structural hairline border */
+  --border-subtle: #f1f5f9;  /* Micro-divider */
+  --border-focus:  #2563eb;  /* Focus ring blue */
 
   /* ── Typography ──────────────────────────────────────── */
   --font-sans:    'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont,
                   'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 
-  --text-main:    #131b2e;   /* Stitch on-surface */
-  --text-muted:   #44474e;   /* Stitch on-surface-variant */
-  --text-light:   #74777f;   /* Stitch outline — lightest readable text */
-  --text-inverse: #eef0ff;   /* Stitch inverse-on-surface — text on dark bg */
+  --text-main:    #0f172a;   /* Slate 900 for high-contrast readability */
+  --text-muted:   #475569;   /* Slate 600 */
+  --text-light:   #64748b;   /* Slate 500 */
+  --text-inverse: #ffffff;   /* Pure white on dark */
 
-  /* ── Border radius (Stitch rounded scale) ────────────── */
-  --radius-xs:   4px;      /* Stitch rounded.sm (0.25rem) — tiny chips, dots */
-  --radius-sm:   8px;      /* Stitch rounded.DEFAULT (0.5rem) — buttons, inputs, badges */
-  --radius-md:   12px;     /* Stitch rounded.md (0.75rem) — cards, form panels */
-  --radius-lg:   16px;     /* Stitch rounded.xl (1rem) — modals, drawers */
-  --radius-full: 9999px;   /* Pill badges, avatars */
+  /* ── Border radius scale ─────────────────────────────── */
+  --radius-xs:   4px;
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   14px;
+  --radius-xl:   20px;
+  --radius-full: 9999px;
 
-  /* ── Elevation shadows (navy-tinted, per Stitch spec) ── */
-  /* Layer 1 — Cards, lists, panels */
-  --shadow-sm: 0 1px 3px 0 rgba(15, 32, 66, 0.04),
-               0 1px 2px -1px rgba(15, 32, 66, 0.02);
-  /* Layer 2 — Active / hover interactive state */
-  --shadow-md: 0 4px 6px -1px rgba(15, 32, 66, 0.06),
-               0 2px 4px -2px rgba(15, 32, 66, 0.04);
-  /* Layer 3 — Modals, overlays, floating banners */
-  --shadow-lg: 0 20px 25px -5px rgba(15, 32, 66, 0.08),
-               0 8px 10px -6px rgba(15, 32, 66, 0.04);
+  /* ── Refined Layered Box Shadows ─────────────────────── */
+  --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.03);
+  --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
 
-  /* ── Spacing cadence (Stitch spacing scale) ──────────── */
+  /* ── Spacing Cadence ─────────────────────────────────── */
   --space-xs: 0.25rem;  /*  4px */
   --space-sm: 0.5rem;   /*  8px */
   --space-md: 1rem;     /* 16px */
@@ -88,11 +93,18 @@
 }
 
 /* ── Global reset & base typography ─────────────────────── */
-* {
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
   font-family: var(--font-sans);
+}
+
+html {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -100,13 +112,18 @@ body {
   color: var(--text-main);
   line-height: 1.5;
   min-height: 100vh;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
 }
 
 /* Container */
 .container {
-  max-width: 1200px;
+  max-width: 1280px;
+  width: 100%;
   margin: 0 auto;
   padding: 0 1.25rem;
+  box-sizing: border-box;
 }
 
 /* Header / Navbar */

@@ -118,16 +118,38 @@ if (typeof document !== "undefined") {
     await loadTechnicians();
     await loadStaffTasks();
 
-    // 2. Setup Role Notice Banner
+    // 2. Setup Role Notice Banner & Visual Identity
     const user = ApiClient.getUser();
-    if (user && user.role === "TECHNICIAN") {
+    if (user) {
       const techNotice = document.getElementById("techRoleNotice");
       const techNoticeText = document.getElementById("techRoleNoticeText");
-      if (techNotice) {
-        if (techNoticeText) {
-          techNoticeText.textContent = `Active Ground Staff: ${user.full_name} (${user.trade_specialty || "Maintenance Specialist"})`;
+      const titleEl = document.getElementById("workboardTitle");
+      const descEl = document.getElementById("workboardDesc");
+      const myTasksLabel = document.getElementById("tabMyTasksLabel");
+
+      if (user.role === "SUPERVISOR") {
+        if (techNotice) {
+          if (techNoticeText) {
+            techNoticeText.textContent = `Operations Supervisor: ${user.full_name} | Shift Dispatch & Ground Workboard`;
+          }
+          techNotice.style.background = "#eff6ff";
+          techNotice.style.borderColor = "#93c5fd";
+          techNotice.style.color = "#1e40af";
+          techNotice.style.display = "flex";
         }
-        techNotice.style.display = "flex";
+        if (titleEl) titleEl.textContent = "Supervisor Dispatch & Operations Workboard";
+        if (descEl) descEl.textContent = "Assign specialist technicians, monitor live repair queues, and track field resolution progress.";
+        if (myTasksLabel) myTasksLabel.textContent = "Assigned to Team";
+      } else if (user.role === "TECHNICIAN") {
+        if (techNotice) {
+          if (techNoticeText) {
+            techNoticeText.textContent = `Active Ground Staff: ${user.full_name} (${user.trade_specialty || "Maintenance Specialist"})`;
+          }
+          techNotice.style.display = "flex";
+        }
+        if (titleEl) titleEl.textContent = "Field Operations & Work Orders";
+        if (descEl) descEl.textContent = "Active repair queue: view assigned jobs, start work on site, and submit photographic proof of completion.";
+        if (myTasksLabel) myTasksLabel.textContent = "My Assigned Tasks";
       }
     }
 
@@ -254,7 +276,13 @@ function filterAndRenderTasks() {
   if (currentTaskTab === "CRITICAL") {
     filtered = filtered.filter((t) => t.priority === "LECTURE_CRITICAL");
   } else if (currentTaskTab === "MY_ASSIGNED") {
-    filtered = filtered.filter((t) => userId && t.assigned_technician_id === userId);
+    const userRole = user ? (user.role || "").toUpperCase() : "";
+    const isSupervisor = userRole === "SUPERVISOR" || userRole === "ADMIN";
+    if (isSupervisor) {
+      filtered = filtered.filter((t) => Boolean(t.assigned_technician_id));
+    } else {
+      filtered = filtered.filter((t) => userId && t.assigned_technician_id === userId);
+    }
   }
 
   // 2. Status Select Filter
@@ -303,7 +331,12 @@ function filterAndRenderTasks() {
 
 function renderTaskCard(task) {
   const user = ApiClient.getUser();
-  const isSupervisor = user && (user.role === "SUPERVISOR" || user.role === "ADMIN");
+  const userId = user ? user.user_id : null;
+  const userRole = user ? (user.role || "").toUpperCase() : "";
+  const isSupervisor = userRole === "SUPERVISOR" || userRole === "ADMIN";
+  const isTechnician = userRole === "TECHNICIAN";
+  const isAssignedTech = isTechnician && Boolean(task.assigned_technician_id) && userId === task.assigned_technician_id;
+  const isUnassigned = task.status === "SUBMITTED" || !task.assigned_technician_id;
 
   const isLectureCritical = task.priority === "LECTURE_CRITICAL";
   const cardCriticalClass = isLectureCritical ? "tech-card-critical" : "";
@@ -314,9 +347,9 @@ function renderTaskCard(task) {
 
   const statusBadge = `badge badge-${task.status.toLowerCase()}`;
 
-  // Supervisor Assignment Dropdown
+  // Supervisor Assignment Dropdown (Strictly on SUBMITTED or unassigned tickets)
   let assignControlsHtml = "";
-  if (isSupervisor && task.status === "SUBMITTED") {
+  if (isSupervisor && isUnassigned) {
     const techOptions = techniciansList
       .map((t) => `<option value="${t.id}">${escapeHtml(t.full_name)} (${escapeHtml(t.trade_specialty || "General")})</option>`)
       .join("");
@@ -339,16 +372,19 @@ function renderTaskCard(task) {
     `;
   }
 
-  // Ground Worker 1-Click Action Buttons
+  // Action Buttons:
+  // 1. SUBMITTED or unassigned ticket: Hide Start Work (only supervisor sees dispatch controls)
+  // 2. ASSIGNED ticket: Start Work is available ONLY to the assigned technician (not supervisor or another technician)
+  // 3. IN_PROGRESS ticket: Upload Fix Photo & Complete is available to the assigned technician (or supervisor)
   let workerActionsHtml = "";
-  if (task.status === "ASSIGNED" || task.status === "SUBMITTED") {
+  if (task.status === "ASSIGNED" && isAssignedTech) {
     workerActionsHtml = `
       <button class="btn btn-primary" onclick="updateTaskStatus(${task.id}, 'IN_PROGRESS')" style="display: flex; align-items: center; gap: 0.4rem; font-weight: 700;">
         <span class="material-symbols-outlined" style="font-size: 18px;">play_arrow</span>
         <span>🟢 Start Work</span>
       </button>
     `;
-  } else if (task.status === "IN_PROGRESS") {
+  } else if (task.status === "IN_PROGRESS" && (isAssignedTech || isSupervisor)) {
     workerActionsHtml = `
       <button class="btn btn-success" onclick="openProofModal(${task.id})" style="display: flex; align-items: center; gap: 0.4rem; font-weight: 700;">
         <span class="material-symbols-outlined" style="font-size: 18px;">photo_camera</span>
@@ -366,6 +402,21 @@ function renderTaskCard(task) {
       </div>
     `;
   }
+
+  // Worker detail formatting
+  let workerDisplay = "";
+  if (task.assigned_technician_name) {
+    const isMe = isTechnician && userId === task.assigned_technician_id;
+    workerDisplay = `<span style="color: #166534; font-weight: 700;">${escapeHtml(task.assigned_technician_name)}${isMe ? " (You)" : ""}</span>`;
+  } else {
+    workerDisplay = `<span style="color: #ea580c; font-weight: 700;">Awaiting Dispatch</span>`;
+  }
+
+  const actionsContainerHtml = workerActionsHtml ? `
+    <div class="tech-mobile-actions" style="margin-top: 1rem; display: flex; justify-content: flex-end; gap: 0.5rem;">
+      ${workerActionsHtml}
+    </div>
+  ` : "";
 
   return `
     <div class="tech-card-modern ${cardCriticalClass} tech-mobile-card" id="task-card-${task.id}">
@@ -394,16 +445,13 @@ function renderTaskCard(task) {
         </div>
         <div style="display: flex; align-items: center; gap: 0.35rem;">
           <span class="material-symbols-outlined" style="font-size: 18px; color: #166534;">badge</span>
-          <span><strong>Worker:</strong> ${escapeHtml(task.assigned_technician_name || "Awaiting Dispatch")}</span>
+          <span><strong>Worker:</strong> ${workerDisplay}</span>
         </div>
       </div>
 
       ${slotHtml}
       ${assignControlsHtml}
-
-      <div class="tech-mobile-actions" style="margin-top: 1rem; display: flex; justify-content: flex-end; gap: 0.5rem;">
-        ${workerActionsHtml}
-      </div>
+      ${actionsContainerHtml}
     </div>
   `;
 }
@@ -417,8 +465,9 @@ async function handleAssignWorker(taskId) {
   }
 
   try {
-    await ApiClient.assignTicket(taskId, parseInt(techId));
-    showToast("Work order dispatched to ground worker successfully!", "success");
+    const res = await ApiClient.assignTicket(taskId, parseInt(techId));
+    const workerName = res && res.assigned_to ? res.assigned_to : "Specialist";
+    showToast(`Work order dispatched to ${workerName} successfully!`, "success");
     await loadStaffTasks();
   } catch (e) {
     console.error("Dispatch error:", e);
@@ -619,5 +668,6 @@ if (typeof module !== "undefined" && module.exports) {
     checkTechnicianAuthGuard,
     submitProof,
     handleProofFileChange,
+    renderTaskCard,
   };
 }

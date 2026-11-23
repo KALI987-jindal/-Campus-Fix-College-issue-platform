@@ -38,7 +38,7 @@ def get_department_stats(department_id: int, db: Session = Depends(get_db)):
         Issue.is_sla_breached == True
     ).count()
 
-    resolution_rate = round((resolved / total * 100), 1) if total > 0 else 100.0
+    resolution_rate = round((resolved / total * 100), 1) if total > 0 else None
 
     return {
         "department_id": dept.id,

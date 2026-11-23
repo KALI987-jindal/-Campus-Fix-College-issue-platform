@@ -64,6 +64,9 @@ def assign_ticket(
     if not issue:
         raise HTTPException(status_code=404, detail="Issue not found")
 
+    if issue.status in ["RESOLVED", "CLOSED"]:
+        raise HTTPException(status_code=400, detail="Cannot assign a resolved or closed ticket")
+
     tech = db.query(User).filter(User.id == assign_in.assigned_technician_id, User.role == "TECHNICIAN").first()
     if not tech:
         raise HTTPException(status_code=400, detail="Invalid technician ID")
@@ -101,7 +104,26 @@ def update_status(
     if not issue:
         raise HTTPException(status_code=404, detail="Issue not found")
 
+    if issue.status == "CLOSED":
+        raise HTTPException(status_code=400, detail="Issue is already closed and signed off")
+
     new_status = status_update.status.upper()
+
+    # Rule: Starting work (transition to IN_PROGRESS)
+    # 1. Ticket must be assigned to a technician
+    # 2. Only the assigned technician can start work (not Supervisor, not another technician)
+    if new_status == "IN_PROGRESS":
+        if not issue.assigned_technician_id:
+            raise HTTPException(
+                status_code=400,
+                detail="Cannot start work on an unassigned ticket. A technician must be assigned first."
+            )
+        if current_user.role != "TECHNICIAN" or current_user.id != issue.assigned_technician_id:
+            raise HTTPException(
+                status_code=403,
+                detail="Not authorised: only the assigned technician can start work on this ticket."
+            )
+
     issue.status = new_status
 
     if new_status == "RESOLVED":

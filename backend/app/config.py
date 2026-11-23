@@ -6,8 +6,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 UPLOAD_DIR = BASE_DIR / "uploads"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
+# Demo Mode Configuration
+IS_DEMO_MODE = os.getenv("CAMPUS_FIX_DEMO", "").lower() in ("1", "true", "yes")
+
 # Database Configuration
-DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'campus_fix.db'}")
+if IS_DEMO_MODE:
+    DEMO_DB_PATH = BASE_DIR / "campus_fix_demo.db"
+    resolved_override = os.getenv("DATABASE_URL", "")
+    if "campus_fix.db" in resolved_override and "campus_fix_demo.db" not in resolved_override:
+        raise RuntimeError("CRITICAL SAFETY ERROR: Demo mode cannot be configured to use permanent database 'campus_fix.db'!")
+    DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{DEMO_DB_PATH}")
+else:
+    DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'campus_fix.db'}")
 
 # Security & JWT Configuration
 # SECRET_KEY must be set in the environment (.env file).

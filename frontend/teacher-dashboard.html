@@ -122,7 +122,7 @@
             Welcome back, <span id="welcomeTeacherName">Professor</span>!
           </h1>
           <p class="stitch-welcome-desc">
-            Manage classroom technical emergencies, departmental laboratory infrastructure, and confidential faculty quarters work orders with expedited academic priority dispatch.
+            Manage classroom emergencies, departmental labs, and confidential faculty quarters with priority dispatch.
             <span class="stitch-dept-highlight" id="facultyDeptSubtitle">Engineering & Technology</span>
           </p>
         </div>
@@ -220,6 +220,11 @@
       <!-- Populated via teacher.js -->
     </div>
 
+    <!-- Distinct HOD Executive Department Governance Console (Dynamic for HOD role) -->
+    <div id="hodDepartmentConsoleContainer" style="display: none; margin-bottom: 1.75rem;">
+      <!-- Populated via teacher.js for HOD role -->
+    </div>
+
     <!-- Main 2-Column Academic Operations Grid (8 cols Left / 4 cols Right) -->
     <div class="stitch-main-grid">
 
@@ -230,8 +235,8 @@
         <div class="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-md" style="background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem;">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm pb-space-xs" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.75rem;">
             <div>
-              <h2 class="stitch-card-title" style="font-size: 1.35rem; color: var(--primary);">Department & Classroom Requests</h2>
-              <p class="stitch-section-desc">Classroom teaching hubs, departmental laboratories, and private quarters work orders.</p>
+              <h2 class="stitch-card-title" id="teacherQueueTitle" style="font-size: 1.35rem; color: var(--primary);">Department & Classroom Requests</h2>
+              <p class="stitch-section-desc" id="teacherQueueDesc">Classroom teaching hubs, departmental laboratories, and private quarters work orders.</p>
             </div>
             <span class="stitch-section-badge" id="queueActiveBadge">Loading Queue...</span>
           </div>
